@@ -1,0 +1,66 @@
+// resources/scss/_nav.scss
+
+.custom-navbar {
+    background-color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    padding: 1rem 0;
+    transition: $transition-speed;
+
+    .navbar-brand {
+        font-weight: 700;
+        font-size: 1.5rem;
+        color: $primary-color;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        i {
+            font-size: 1.8rem;
+        }
+    }
+
+    .nav-link {
+        font-weight: 500;
+        color: $text-main;
+        margin: 0 10px;
+        position: relative;
+        transition: color $transition-speed;
+
+        &:hover, &.active {
+            color: $primary-color;
+        }
+
+        // Hiệu ứng gạch chân
+        &::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 50%;
+            background-color: $primary-color;
+            transition: all $transition-speed;
+            transform: translateX(-50%);
+        }
+
+        &:hover::after, &.active::after {
+            width: 100%;
+        }
+    }
+
+    .btn-sidebar-toggle {
+        border: none;
+        background: transparent;
+        font-size: 1.5rem;
+        color: $text-main;
+        padding: 5px;
+        cursor: pointer;
+        transition: transform $transition-speed;
+
+        &:hover {
+            color: $primary-color;
+            transform: rotate(90deg);
+        }
+    }
+}

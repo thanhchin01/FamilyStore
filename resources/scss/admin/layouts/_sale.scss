@@ -1,0 +1,74 @@
+// resources/scss/admin/_sales.scss
+
+.sales-container {
+    .product-select-card {
+        border: none;
+        border-radius: 1rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+
+    .checkout-summary {
+        position: sticky;
+        top: 100px;
+        background: #fff;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    .customer-debt-info {
+        background: rgba($warning-color, 0.05);
+        border: 1px dashed $warning-color;
+        border-radius: 0.75rem;
+        padding: 1rem;
+    }
+
+    .form-label-custom {
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: $text-main;
+        margin-bottom: 0.5rem;
+    }
+
+    .input-group-text-custom {
+        background: #fff;
+        border-right: none;
+        color: $text-light;
+    }
+
+    .input-custom {
+        border-left: none;
+        &:focus {
+            box-shadow: none;
+            border-color: #dee2e6;
+        }
+    }
+}
+
+// Lịch sử bán hàng
+.sales-history-container {
+
+    .filter-card {
+        border-radius: 1rem;
+        border: none;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .history-table-card {
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    table {
+        th {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: $text-main;
+        }
+
+        td {
+            font-size: 0.9rem;
+        }
+    }
+}

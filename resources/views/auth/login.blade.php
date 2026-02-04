@@ -1,34 +1,73 @@
-@extends('admin.layout')
+<!DOCTYPE html>
+<html lang="vi">
 
-@section('content')
-    <div class="max-w-md mx-auto">
-        <h1 class="text-2xl font-semibold mb-4">Login</h1>
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        @if($errors->any())
-            <div class="mb-4 text-red-600">
-                {{ $errors->first() }}
-            </div>
-        @endif
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-        <form method="POST" action="{{ route('login') }}">
-            @csrf
-            <div class="mb-3">
-                <label class="block text-sm">Email</label>
-                <input type="email" name="email" value="{{ old('email') }}" required class="w-full p-2 border" />
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- SCSS compile -->
+    @vite(['resources/scss/admin/login.scss'])
+</head>
+
+<body class="admin-login">
+
+    <div class="login-wrapper">
+        <div class="login-card shadow-lg">
+            <!-- Left -->
+            <div class="login-left d-none d-md-flex">
+                <div class="overlay">
+                    <h2>Admin Panel</h2>
+                    <p>Quản lý hệ thống một cách chuyên nghiệp</p>
+                </div>
             </div>
-            <div class="mb-3">
-                <label class="block text-sm">Password</label>
-                <input type="password" name="password" required class="w-full p-2 border" />
+
+            <!-- Right -->
+            <div class="login-right">
+                <h4 class="fw-bold mb-2">Đăng nhập quản trị</h4>
+                <p class="text-muted mb-4">Vui lòng đăng nhập để tiếp tục</p>
+
+                <form method="POST" action="#">
+                    @csrf
+
+                    <div class="form-group mb-3">
+                        <label class="form-label">Email</label>
+                        <div class="input-icon">
+                            <i class="fa-solid fa-envelope"></i>
+                            <input type="email" class="form-control" placeholder="admin@email.com">
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="form-label">Mật khẩu</label>
+                        <div class="input-icon">
+                            <i class="fa-solid fa-lock"></i>
+                            <input type="password" class="form-control" placeholder="••••••••">
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox">
+                            <label class="form-check-label">Ghi nhớ</label>
+                        </div>
+                        <a href="#" class="text-decoration-none small">Quên mật khẩu?</a>
+                    </div>
+
+                    <button class="btn btn-primary w-100 py-2">
+                        <i class="fa-solid fa-right-to-bracket me-2"></i> Đăng nhập
+                    </button>
+                </form>
             </div>
-            <div class="mb-3">
-                <label class="inline-flex items-center text-sm">
-                    <input type="checkbox" name="remember" class="mr-2" /> Remember me
-                </label>
-            </div>
-            <div>
-                <button type="submit" class="px-4 py-2 bg-black text-white">Login</button>
-                <a href="/" class="ml-3 text-sm">Cancel</a>
-            </div>
-        </form>
+        </div>
     </div>
-@endsection
+
+</body>
+
+</html>

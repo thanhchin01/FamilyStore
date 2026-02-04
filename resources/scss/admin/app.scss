@@ -1,0 +1,38 @@
+// resources/scss/app.scss
+
+// 1. Variables (Phải import đầu tiên)
+@import 'shared/variables';
+
+// 2. Bootstrap (Nếu cài qua npm)
+@import 'bootstrap/scss/bootstrap';
+@import 'shared/responsive';
+// 3. Components
+@import 'partials/nav';
+@import 'partials/sidebar';
+@import 'partials/footer';
+@import 'partials/login';
+@import 'layouts/dashboard';
+@import 'layouts/inventory';
+@import 'layouts/sale';
+@import 'layouts/debt';
+@import 'layouts/stock';
+@import 'layouts/product';
+// 4. Global Styles
+body {
+    font-family: $font-main;
+    background-color: $light-bg;
+    color: $text-main;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+main {
+    flex: 1;
+    margin-top: 80px; // Bù khoảng trống cho fixed navbar
+}
+
+a {
+    text-decoration: none;
+}

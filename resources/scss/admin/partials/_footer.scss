@@ -1,0 +1,14 @@
+// resources/scss/_footer.scss
+
+.custom-footer {
+    background-color: $footer-bg;
+    color: $text-light;
+    margin-top: auto;
+
+    .footer-bottom {
+        border-top: 1px solid rgba(255,255,255,0.1);
+        padding-top: 1.5rem;
+        text-align: center;
+        font-size: 0.9rem;
+    }
+}

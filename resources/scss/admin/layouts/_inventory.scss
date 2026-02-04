@@ -1,0 +1,73 @@
+// resources/scss/admin/_inventory.scss
+
+.inventory-card {
+    border: none;
+    border-radius: 1.25rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04);
+    background: #fff;
+    overflow: hidden;
+}
+
+// Style cho Tab điều hướng sản phẩm
+.inventory-tabs {
+    border-bottom: 1px solid #f1f5f9;
+    padding: 0 1.5rem;
+    background: #fff;
+    display: flex;
+    gap: 2rem;
+
+    .tab-item {
+        padding: 1rem 0;
+        color: $text-light;
+        font-weight: 600;
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        transition: all $transition-speed;
+        text-decoration: none;
+
+        &:hover {
+            color: $primary-color;
+        }
+
+        &.active {
+            color: $primary-color;
+            border-bottom-color: $primary-color;
+        }
+    }
+}
+
+.stock-indicator-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 0.85rem;
+
+    li {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 4px 0;
+    }
+
+    .status-signal {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+
+        &.signal-danger { background-color: $danger-color; box-shadow: 0 0 0 2px rgba($danger-color, 0.2); }
+        &.signal-warning { background-color: $warning-color; box-shadow: 0 0 0 2px rgba($warning-color, 0.2); }
+        &.signal-success { background-color: $success-color; box-shadow: 0 0 0 2px rgba($success-color, 0.2); }
+    }
+}
+
+.stock-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+
+    &.status-red { background-color: rgba($danger-color, 0.1); color: $danger-color; }
+    &.status-yellow { background-color: rgba($warning-color, 0.1); color: $warning-color; }
+    &.status-green { background-color: rgba($success-color, 0.1); color: $success-color; }
+}

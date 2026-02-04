@@ -1,0 +1,146 @@
+@import 'variables';
+
+/* Responsive tweaks for admin layout */
+@media (min-width: 992px) {
+
+    /* On large screens keep offcanvas available but open by default if desired */
+    .offcanvas-lg-show {
+        transform: none !important;
+        visibility: visible !important;
+    }
+
+    .admin-main-content {
+        margin-left: unset; // Tùy vào việc bạn có dùng sidebar cố định hay không
+        transition: margin $transition-speed;
+    }
+}
+
+/* Tối ưu hiển thị cho máy tính bảng (Tablet) */
+@media (max-width: 991px) {
+   .inventory-tabs {
+        overflow-x: auto;
+        white-space: nowrap;
+        padding: 0 1rem;
+        gap: 1.25rem;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab-item {
+            font-size: 0.85rem;
+            padding: 0.75rem 0;
+        }
+    }
+
+    .inventory-card {
+        border-radius: 1rem;
+    }
+
+    table {
+        font-size: 0.9rem;
+
+        th, td {
+            white-space: nowrap;
+        }
+
+        td:last-child {
+            min-width: 120px;
+        }
+    }
+}
+
+
+@media (max-width: 768px) {
+  .admin-navbar .brand-text { display: none; }
+
+  .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 1rem;
+
+        .actions {
+            width: 100%;
+            .form-select { width: 100%; }
+        }
+    }
+
+    /* Header */
+    .inventory-wrapper > .d-flex {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+
+        button {
+            width: 100%;
+        }
+    }
+
+    /* Tabs */
+    .inventory-tabs {
+        padding: 0 0.75rem;
+        gap: 1rem;
+
+        .tab-item {
+            font-size: 0.8rem;
+        }
+    }
+
+    /* TABLE → CARD VIEW */
+    .inventory-card {
+
+        table,
+        thead,
+        tbody,
+        th,
+        tr {
+            display: block;
+        }
+
+        thead {
+            display: none;
+        }
+
+        tbody tr {
+            background: #fff;
+            border-bottom: 1px solid #f1f5f9;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,.03);
+        }
+
+        td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.4rem 0;
+            border: none !important;
+            font-size: 0.85rem;
+
+            &:before {
+                content: attr(data-label);
+                font-weight: 600;
+                color: #64748b;
+            }
+        }
+
+        td:first-child {
+            flex-direction: column;
+            align-items: flex-start;
+
+            &:before {
+                display: none;
+            }
+        }
+
+        td:last-child {
+            justify-content: center;
+            gap: 0.5rem;
+
+            &:before {
+                display: none;
+            }
+        }
+    }
+}

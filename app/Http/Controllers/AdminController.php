@@ -8,12 +8,36 @@ class AdminController extends Controller
 {
     public function index()
     {
-        return view('admin.dashboard');
+        return view('admin.layouts.dashboard.index');
     }
 
-    public function users()
+    public function inventory()
     {
-        $users = \App\Models\User::paginate(10);
-        return view('admin.users.index', compact('users'));
+        return view('admin.layouts.inventory.index');
     }
+
+    public function sale()
+    {
+        return view('admin.layouts.sale.index');
+    }
+
+     public function debt()
+    {
+        return view('admin.layouts.debt_list.index');
+    }
+
+     public function stock()
+    {
+        return view('admin.layouts.stock_entry.index');
+    }
+
+    public function products()
+    {
+        return view('admin.layouts.product.index');
+    }
+    // public function users()
+    // {
+    //     $users = \App\Models\User::paginate(10);
+    //     return view('admin.users.index', compact('users'));
+    // }
 }

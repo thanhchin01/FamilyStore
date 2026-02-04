@@ -1,0 +1,32 @@
+// resources/scss/admin/_stock.scss
+
+.stock-entry-container {
+    .entry-card {
+        border: none;
+        border-radius: 1.25rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        background: #fff;
+    }
+
+    .input-group-text-icon {
+        background-color: #f8fafc;
+        border-right: none;
+        color: $text-light;
+    }
+
+    .form-control-custom {
+        border-left: none;
+        &:focus {
+            box-shadow: none;
+            border-color: #dee2e6;
+        }
+    }
+
+    .recent-entry-list {
+        .entry-item {
+            padding: 1rem;
+            border-bottom: 1px solid #f1f5f9;
+            &:last-child { border-bottom: none; }
+        }
+    }
+}

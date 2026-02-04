@@ -10,7 +10,13 @@ Route::get('/', function () {
 
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [AdminController::class, 'index'])->name('dashboard');
-    Route::get('/users', [AdminController::class, 'users'])->name('users');
+    Route::get('/inventory', [AdminController::class, 'inventory'])->name('inventory');
+    Route::get('/sale', [AdminController::class, 'sale'])->name('sale');
+    Route::get('/debt', [AdminController::class, 'debt'])->name('debt');
+    Route::get('/stock', [AdminController::class, 'stock'])->name('stock');
+    Route::get('/products', [AdminController::class, 'products'])->name('products');
+
+    // Route::get('/users', [AdminController::class, 'users'])->name('users');stock
 });
 
 // Authentication routes (simple custom)

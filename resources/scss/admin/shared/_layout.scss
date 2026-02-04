@@ -1,0 +1,57 @@
+@import 'variables';
+
+/* Navbar */
+.admin-navbar {
+  background: $bg;
+  padding: 0.5rem 1rem;
+}
+
+.admin-navbar .brand-mark {
+  display: inline-flex;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: $brand-mark-bg;
+  color: $brand-mark-color;
+  font-weight: 700;
+}
+
+.admin-navbar .brand-text {
+  font-weight: 600;
+  color: darken($secondary, 10%);
+}
+
+.avatar {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+/* Sidebar / Offcanvas */
+.offcanvas-end {
+  background: $sidebar-bg;
+  border-left: 1px solid $sidebar-border;
+}
+
+.offcanvas .list-group-item {
+  border: none;
+  padding: 0.9rem 1rem;
+  transition: background .12s ease, color .12s ease;
+}
+
+.offcanvas .list-group-item:hover {
+  background: rgba($primary, 0.06);
+  color: $primary;
+}
+
+.offcanvas .list-group-item span.me-2 { font-size: 1.05rem; }
+
+// /* Footer */
+// .admin-footer {
+//   background: $bg;
+// }

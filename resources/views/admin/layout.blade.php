@@ -1,39 +1,42 @@
-<!doctype html>
-<html lang="en">
+<!-- resources/views/layouts/app.blade.php -->
+<!DOCTYPE html>
+<html lang="vi">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Admin - {{ config('app.name') }}</title>
-    @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @else
-        <link rel="stylesheet" href="{{ asset('css/app.css') }}">
-    @endif
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@yield('title', 'Trang chủ') - MyProject</title>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="[https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css](https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css)">
+
+    <!-- Google Fonts -->
+    <link href="[https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap](https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap)" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Styles (Biên dịch từ app.scss) -->
+    @vite(['resources/scss/admin/app.scss', 'resources/js/admin/app.js'])
 </head>
-<body class="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-    <div class="flex">
-        <aside class="w-64 p-4 border-r">
-            <div class="flex items-center justify-between">
-                <h2 class="font-medium mb-4">Admin</h2>
-            </div>
-            <nav class="flex flex-col gap-2 text-sm">
-                <a href="{{ route('admin.dashboard') }}" class="underline">Dashboard</a>
-                <a href="{{ route('admin.users') }}" class="underline">Users</a>
-            </nav>
-            @auth
-                <div class="mt-6 text-sm">
-                    <div>Signed in as <strong>{{ auth()->user()->name }}</strong></div>
-                    <form method="POST" action="{{ route('logout') }}" class="mt-2">
-                        @csrf
-                        <button type="submit" class="text-red-600">Logout</button>
-                    </form>
-                </div>
-            @endauth
-        </aside>
-        <main class="flex-1 p-6">
+<body>
+
+    <!-- Include Navbar -->
+    @include('admin.partials.nav')
+
+    <!-- Include Sidebar (Offcanvas) -->
+    @include('admin.partials.sidebar')
+
+    <!-- Main Content -->
+    <main>
+        <div class="container">
             @yield('content')
-        </main>
-    </div>
-    @include('partials.toast')
-    </body>
+        </div>
+    </main>
+
+    <!-- Include Footer -->
+    @include('admin.partials.footer')
+
+
+    <!-- Cách 2: Dùng Vite (Chuẩn Laravel) - Đảm bảo đã chạy npm install bootstrap -->
+    <!-- @vite(['resources/js/admin/app.js']) -->
+    {{-- <script src="[https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js](https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js)"></script> --}}
+</body>
 </html>
