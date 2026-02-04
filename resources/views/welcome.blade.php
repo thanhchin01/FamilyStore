@@ -30,6 +30,12 @@
                         >
                             Dashboard
                         </a>
+                        <a
+                            href="{{ url('/admin') }}"
+                            class="inline-block px-5 py-1.5 dark:text-[#EDEDEC] border-[#19140035] hover:border-[#1915014a] border text-[#1b1b18] dark:border-[#3E3E3A] dark:hover:border-[#62605b] rounded-sm text-sm leading-normal ml-2"
+                        >
+                            Admin
+                        </a>
                     @else
                         <a
                             href="{{ route('login') }}"
@@ -273,5 +279,6 @@
         @if (Route::has('login'))
             <div class="h-14.5 hidden lg:block"></div>
         @endif
+        @include('partials.toast')
     </body>
 </html>
