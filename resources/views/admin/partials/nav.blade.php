@@ -22,10 +22,7 @@
                     <a class="nav-link {{ request()->is('admin.products') ? 'active' : '' }}" href="{{ route('admin.products') }}">Sản phẩm</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Dịch vụ</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Liên hệ</a>
+                    <a class="nav-link {{ request()->is('admin.history') ? 'active' : '' }}" href="{{ route('admin.history') }}">Lịch sử bán hàng</a>
                 </li>
             </ul>
         </div>

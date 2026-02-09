@@ -1,5 +1,5 @@
-{{-- Toast partial using Toastify (CDN) - include this before closing body
-<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script> --}}
+{{-- Toast partial using Toastify (CDN) - include this before closing body --}}
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 @if(session('success'))
     <script>
         document.addEventListener('DOMContentLoaded', function(){

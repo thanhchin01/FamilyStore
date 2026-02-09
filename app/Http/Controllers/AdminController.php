@@ -21,6 +21,11 @@ class AdminController extends Controller
         return view('admin.layouts.sale.index');
     }
 
+     public function history()
+    {
+        return view('admin.layouts.history.index');
+    }
+
      public function debt()
     {
         return view('admin.layouts.debt_list.index');
@@ -35,9 +40,9 @@ class AdminController extends Controller
     {
         return view('admin.layouts.product.index');
     }
-    // public function users()
-    // {
-    //     $users = \App\Models\User::paginate(10);
-    //     return view('admin.users.index', compact('users'));
-    // }
+
+    public function statistics()
+    {
+        return view('admin.layouts.statistics.index');
+    }
 }

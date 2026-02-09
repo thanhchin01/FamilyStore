@@ -1,0 +1,17 @@
+// resources/scss/app.scss
+
+// Basic app styles using Bootstrap
+@import 'bootstrap/scss/bootstrap';
+
+// App variables
+$font-main: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+
+body {
+  font-family: $font-main;
+  background-color: #ffffff;
+  color: #212529;
+}
+
+a {
+  text-decoration: none;
+}

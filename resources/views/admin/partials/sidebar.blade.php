@@ -11,40 +11,72 @@
         <!-- Menu Links -->
         <ul class="sidebar-menu flex-grow-1">
             <li class="sidebar-item">
-                <a href="{{ route('admin.dashboard') }}" class="sidebar-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                <a href="{{ route('admin.dashboard') }}"
+                    class="sidebar-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                     <i class="fa-solid fa-house"></i> Dashboard
                 </a>
             </li>
             <li class="sidebar-item">
-                <a href="{{ route('admin.sale') }}" class="sidebar-link {{ request()->routeIs('admin.sale') ? 'active' : '' }}">
+                <a href="{{ route('admin.sale') }}"
+                    class="sidebar-link {{ request()->routeIs('admin.sale') ? 'active' : '' }}">
                     <i class="fa-solid fa-chart-line"></i> Bán hàng
                 </a>
             </li>
             <li class="sidebar-item">
-                <a href="{{ route('admin.inventory')}}" class="sidebar-link {{ request()->routeIs('admin.inventory') ? 'active' : '' }}">
+                <a href="{{ route('admin.inventory') }}"
+                    class="sidebar-link {{ request()->routeIs('admin.inventory') ? 'active' : '' }}">
                     <i class="fa-solid fa-box-open"></i> Quản lý kho hàng
                 </a>
             </li>
             <li class="sidebar-item">
-                <a href="{{ route('admin.debt') }}" class="sidebar-link {{ request()->routeIs('admin.debt') ? 'active' : '' }}">
+                <a href="{{ route('admin.debt') }}"
+                    class="sidebar-link {{ request()->routeIs('admin.debt') ? 'active' : '' }}">
                     <i class="fa-solid fa-users"></i> DS khách hàng nợ
                 </a>
             </li>
             <li class="sidebar-item">
-                <a href="{{ route('admin.stock') }}" class="sidebar-link {{ request()->routeIs('admin.stock') ? 'active' : '' }}">
+                <a href="{{ route('admin.stock') }}"
+                    class="sidebar-link {{ request()->routeIs('admin.stock') ? 'active' : '' }}">
                     <i class="fa-solid fa-gear"></i> Nhập kho
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ route('admin.statistics') }}"
+                    class="sidebar-link {{ request()->routeIs('admin.statistics') ? 'active' : '' }}">
+                    <i class="fa-solid fa-chart-area"></i> Thống kê
                 </a>
             </li>
         </ul>
 
         <!-- User Profile Section -->
-        <div class="sidebar-profile">
+        {{-- <div class="sidebar-profile">
             <img src="{{ asset('images/admin/avatar-1.jpg') }}" alt="User" class="profile-img">
             <div class="profile-info">
                 <h6>Nguyễn Văn A</h6>
                 <span>Admin</span>
             </div>
             <a href="#" class="ms-auto text-light"><i class="fa-solid fa-right-from-bracket"></i></a>
+        </div> --}}
+        <div class="sidebar-profile">
+            <img src="{{ asset('images/admin/avatar-1.jpg') }}" alt="User" class="profile-img">
+
+            <div class="profile-info">
+                <h6>{{ auth()->user()->name ?? 'Admin' }}</h6>
+                <span>Admin</span>
+            </div>
+
+            <!-- Logout -->
+            <a href="#" class="ms-auto text-light"
+                onclick="return confirm('Bạn có chắc muốn đăng xuất?') 
+    && (event.preventDefault(), document.getElementById('logout-form').submit());"
+                title="Đăng xuất">
+                <i class="fa-solid fa-right-from-bracket"></i>
+            </a>
+
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                @csrf
+            </form>
         </div>
+
     </div>
 </div>
