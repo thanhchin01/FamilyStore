@@ -22,6 +22,8 @@ return new class extends Migration
                 ->nullOnDelete(); // Khách mua (có thể không lưu)
             $table->integer('quantity'); // Số lượng bán
             $table->integer('price');  // Giá bán tại thời điểm bán (quan trọng)
+            $table->enum('payment_status', ['paid', 'debt', 'partial'])->default('paid');
+            $table->integer('paid_amount')->default(0);
             $table->date('sold_at');  // Ngày bán
             $table->timestamps();
         });

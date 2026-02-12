@@ -10,16 +10,26 @@ class Products extends Model
     protected $fillable = [
         'category_id',
         'name',
+        'slug',
+        'image',
         'brand',
+        'model',
         'price',
         'warranty_months',
-        'stock'
+        'stock',
+        'is_active',
+        'description'
     ];
+
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
 
     // Sản phẩm thuộc 1 loại
     public function category()
     {
-        return $this->belongsTo(Categories::class);
+        return $this->belongsTo(Categories::class, 'category_id');
     }
 
     // Sản phẩm có nhiều lần nhập hàng
@@ -28,10 +38,9 @@ class Products extends Model
         return $this->hasMany(Imports::class);
     }
 
-     // Sản phẩm có nhiều lần bán
+    // Sản phẩm có nhiều lần bán
     public function sales()
     {
         return $this->hasMany(Sales::class);
     }
 }
-

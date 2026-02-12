@@ -28,8 +28,8 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        toastr()->success('Đăng nhập thành công 🎉');
-        
+        // toastr()->success('Đăng nhập thành công 🎉');
+
         return redirect()->intended(route('dashboard', absolute: false));
     }
 
