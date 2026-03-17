@@ -8,6 +8,8 @@ class Sales extends Model
 {
     //
      protected $fillable = [
+        // ✅ Added: mã hóa đơn (gom nhiều dòng)
+        'invoice_code',
         'product_id',
         'customer_id',
         'quantity',
@@ -18,7 +20,7 @@ class Sales extends Model
     ];
 
     protected $casts = [
-        'sold_at' => 'date'
+        'sold_at' => 'datetime'
     ];
 
      // Lần bán thuộc 1 sản phẩm
@@ -36,5 +38,24 @@ class Sales extends Model
     public function debtTransactions()
     {
         return $this->hasMany(Debt_Transactions::class);
+    }
+
+    /**
+     * Tổng tiền = đơn giá * số lượng
+     */
+    public function getTotalAttribute(): int
+    {
+        return (int) $this->price * (int) $this->quantity;
+    }
+
+    /**
+     * Số tiền còn nợ của hoá đơn này
+     */
+    public function getDebtAttribute(): int
+    {
+        $paid = (int) ($this->paid_amount ?? 0);
+        $total = $this->total;
+
+        return max($total - $paid, 0);
     }
 }

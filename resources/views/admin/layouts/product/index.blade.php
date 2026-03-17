@@ -112,7 +112,7 @@
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Số lượng tồn đầu kỳ <span
                                             class="text-danger">*</span></label>
-                                    <input type="number" name="stock" class="form-control" value="0" min="0"
+                                    <input type="number" name="stock" class="form-control" value="1" min="1"
                                         required>
                                 </div>
 
@@ -136,41 +136,47 @@
 
         <!-- Bộ lọc -->
         <div class="card filter-card mb-4 p-3">
-            <div class="row g-3 align-items-end">
-                <div class="col-md-3">
-                    <label class="form-label small fw-semibold text-muted">Loại sản phẩm</label>
-                    <select class="form-select border-light">
-                        <option>Tất cả danh mục</option>
-                        <option>Nồi cơm điện</option>
-                        <option>Ấm siêu tốc</option>
-                        <option>Vợt muỗi</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label small fw-semibold text-muted">Hãng sản xuất</label>
-                    <select class="form-select border-light">
-                        <option>Tất cả hãng</option>
-                        <option>Sharp</option>
-                        <option>Sunhouse</option>
-                        <option>Comet</option>
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label small fw-semibold text-muted">Tìm kiếm nhanh</label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-white border-end-0 border-light text-muted">
-                            <i class="fa-solid fa-magnifying-glass"></i>
-                        </span>
-                        <input type="text" class="form-control border-start-0 border-light"
-                            placeholder="Nhập tên sản phẩm...">
+            <form method="GET" action="{{ route('admin.products') }}">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-3">
+                        <label class="form-label small fw-semibold text-muted">Loại sản phẩm</label>
+                        <select name="category_id" class="form-select border-light">
+                            <option value="">Tất cả danh mục</option>
+                            @foreach ($categories as $category)
+                                <option value="{{ $category->id }}"
+                                    {{ request('category_id') == $category->id ? 'selected' : '' }}>
+                                    {{ $category->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-semibold text-muted">Hãng sản xuất</label>
+                        <select name="brand" class="form-select border-light">
+                            <option value="">Tất cả hãng</option>
+                            <option value="Sharp" {{ request('brand') == 'Sharp' ? 'selected' : '' }}>Sharp</option>
+                            <option value="Sunhouse" {{ request('brand') == 'Sunhouse' ? 'selected' : '' }}>Sunhouse
+                            </option>
+                            <option value="Comet" {{ request('brand') == 'Comet' ? 'selected' : '' }}>Comet</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold text-muted">Tìm kiếm nhanh</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0 border-light text-muted">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                            </span>
+                            <input type="text" name="keyword" class="form-control border-start-0 border-light"
+                                placeholder="Nhập tên sản phẩm..." value="{{ request('keyword') }}">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-outline-primary w-100 border-2 fw-bold">
+                            Lọc dữ liệu
+                        </button>
                     </div>
                 </div>
-                <div class="col-md-2">
-                    <button class="btn btn-outline-primary w-100 border-2 fw-bold">
-                        Lọc dữ liệu
-                    </button>
-                </div>
-            </div>
+            </form>
         </div>
 
         <!-- Table -->

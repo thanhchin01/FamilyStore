@@ -16,40 +16,71 @@ class SaleService
     }
 
     /**
-     * Bán hàng
+     * Bán hàng nhiều dòng (1 hóa đơn)
      */
-    public function sell(
-        Products $product,
-        int $quantity,
-        int $price,
+    public function sellInvoice(
+        array $items,
         ?Customers $customer = null,
         int $paidAmount = 0
-    ): Sales {
-        // 1. Tạo bản ghi bán
-        $sale = Sales::create([
-            'product_id' => $product->id,
-            'customer_id' => $customer?->id,
-            'quantity' => $quantity,
-            'price' => $price,
-            'sold_at' => now(),
-        ]);
+    ): string {
+        // ✅ Added: invoice_code để gom nhiều dòng bán hàng vào 1 hóa đơn
+        $invoiceCode = (string) \Illuminate\Support\Str::uuid();
 
-        // 2. Trừ kho
-        $product->decrement('stock', $quantity);
+        // Tính tổng tiền hóa đơn
+        $invoiceTotal = 0;
+        foreach ($items as $item) {
+            $invoiceTotal += ((int) $item['price']) * ((int) $item['quantity']);
+        }
 
-        // 3. Tính tiền
-        $total = $price * $quantity;
+        // ✅ Khách vãng lai: luôn trả đủ, không ghi nợ
+        if ($customer === null) {
+            $paidAmount = $invoiceTotal;
+        }
 
-        // 4. Nếu chưa trả đủ → ghi nợ
-        if ($customer && $paidAmount < $total) {
+        // Trạng thái thanh toán theo hóa đơn
+        $paymentStatus = 'paid';
+        if ($customer && $paidAmount < $invoiceTotal) {
+            $paymentStatus = 'debt';
+        }
+
+        $firstSaleId = null;
+        $soldAt = now();
+
+        foreach ($items as $item) {
+            /** @var Products $product */
+            $product = $item['product'];
+            $quantity = (int) $item['quantity'];
+            $price = (int) $item['price'];
+
+            // 1) Tạo dòng bán
+            $sale = Sales::create([
+                'invoice_code' => $invoiceCode,
+                'product_id' => $product->id,
+                'customer_id' => $customer?->id,
+                'quantity' => $quantity,
+                'price' => $price,
+                // ✅ Lưu paid_amount theo hóa đơn (lặp lại trên từng dòng để đọc lịch sử dễ)
+                'payment_status' => $paymentStatus,
+                'paid_amount' => $paidAmount,
+                'sold_at' => $soldAt,
+            ]);
+
+            $firstSaleId ??= $sale->id;
+
+            // 2) Trừ kho
+            $product->decrement('stock', $quantity);
+        }
+
+        // 3) Ghi nợ theo hóa đơn (nếu có)
+        if ($customer && $paidAmount < $invoiceTotal && $firstSaleId) {
             $this->debtService->addDebt(
                 $customer,
-                $total - $paidAmount,
-                $sale->id,
-                "Nợ từ lần mua sản phẩm {$product->name}"
+                $invoiceTotal - $paidAmount,
+                $firstSaleId,
+                'Nợ từ hóa đơn ' . $invoiceCode
             );
         }
 
-        return $sale;
+        return $invoiceCode;
     }
 }

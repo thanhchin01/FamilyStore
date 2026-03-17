@@ -8,6 +8,8 @@ class Imports extends Model
 {
     //
     protected $fillable = [
+        // ✅ Added: mã phiếu nhập (gom nhiều dòng)
+        'receipt_code',
         'product_id',
         'quantity',
         'note',

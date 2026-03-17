@@ -22,33 +22,80 @@ class SaleController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'product_id'   => 'required|exists:products,id',
-            'quantity'     => 'required|integer|min:1',
-            'price'        => 'required|integer|min:0',
-            'customer_type' => 'required|in:guest,customer',
-            'paid_amount'  => 'nullable|integer|min:0',
-        ]);
+        $hasItemsArray = $request->has('items') && is_array($request->items);
 
-        $product = Products::findOrFail($request->product_id);
+        if ($hasItemsArray) {
+            // ✅ Bán nhiều sản phẩm trong 1 lần submit (items[])
+            $request->validate([
+                'customer_type' => 'required|in:guest,customer',
+                'paid_amount'   => 'nullable|integer|min:0',
+                'items'         => 'required|array|min:1',
+                'items.*.product_id' => 'required|exists:products,id',
+                'items.*.quantity'   => 'required|integer|min:1',
+                'items.*.price'      => 'required|integer|min:0',
+            ]);
+        } else {
+            // ✅ Fallback: chỉ bán 1 sản phẩm (cách cũ)
+            $request->validate([
+                'customer_type' => 'required|in:guest,customer',
+                'paid_amount'   => 'nullable|integer|min:0',
+                'product_id'    => 'required|exists:products,id',
+                'quantity'      => 'required|integer|min:1',
+                'price'         => 'required|integer|min:0',
+            ]);
+        }
 
-        // Xử lý khách hàng
+        // Xử lý khách hàng (dùng chung cho cả 2 trường hợp)
         $customer = null;
-
         if ($request->customer_type === 'customer') {
             $customer = Customers::firstOrCreate(
                 ['phone' => $request->phone],
-                ['name' => $request->customer_name]
+                [
+                    'name'          => $request->customer_name ?? '',
+                    'address'       => $request->customer_address ?? null,
+                    'relative_name' => $request->customer_relative_name ?? null,
+                ]
             );
+            $updates = [];
+            if ($request->filled('customer_name')) {
+                $updates['name'] = $request->customer_name;
+            }
+            if ($request->filled('customer_address')) {
+                $updates['address'] = $request->customer_address;
+            }
+            if ($request->filled('customer_relative_name')) {
+                $updates['relative_name'] = $request->customer_relative_name;
+            }
+            if (!empty($updates)) {
+                $customer->update($updates);
+            }
         }
 
-        // Gọi Service bán hàng
-        $this->saleService->sell(
-            product: $product,
-            quantity: $request->quantity,
-            price: $request->price,
+        // Build danh sách items cho service
+        $items = [];
+        if ($hasItemsArray) {
+            foreach ($request->items as $row) {
+                $product = Products::findOrFail($row['product_id']);
+                $items[] = [
+                    'product' => $product,
+                    'quantity' => (int) $row['quantity'],
+                    'price' => (int) $row['price'],
+                ];
+            }
+        } else {
+            $product = Products::findOrFail($request->product_id);
+            $items[] = [
+                'product' => $product,
+                'quantity' => (int) $request->quantity,
+                'price' => (int) $request->price,
+            ];
+        }
+
+        // Gọi Service bán hàng (theo hóa đơn, dù 1 hay nhiều sản phẩm)
+        $this->saleService->sellInvoice(
+            items: $items,
             customer: $customer,
-            paidAmount: $request->paid_amount ?? 0
+            paidAmount: (int) ($request->paid_amount ?? 0)
         );
 
         return redirect()

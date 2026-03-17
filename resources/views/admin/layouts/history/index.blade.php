@@ -59,7 +59,7 @@
                             <th class="text-end">Thao tác</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    {{-- <tbody>
                         <tr>
                             <td>1</td>
                             <td>20/02/2026</td>
@@ -99,10 +99,152 @@
                                 </button>
                             </td>
                         </tr>
+                    </tbody> --}}
+                    <tbody>
+                        @foreach ($sales as $sale)
+                            <tr>
+                                <td>{{ $sale->id }}</td>
+                                <td>{{ $sale->created_at->format('d/m/Y') }}</td>
+                                <td>{{ $sale->product->name }}</td>
+                                {{-- <td>
+                                    <span class="fw-semibold">Nguyễn Văn A</span><br>
+                                    <small class="text-muted">0909xxx999</small>
+                                </td> --}}
+                                <td>
+                                    <strong>{{ $sale->customer?->name ?? 'Khách lẻ' }}</strong><br>
+                                    <small>{{ $sale->customer?->phone }}</small>
+                                </td>
+                                <td>{{ $sale->quantity }}</td>
+                                <td class="fw-bold">
+                                    {{ number_format($sale->total) }}đ
+                                </td>
+                                <td>
+                                    @if ($sale->debt > 0)
+                                        <span class="badge bg-warning text-dark">Còn nợ</span>
+                                    @else
+                                        <span class="badge bg-success">Đã trả đủ</span>
+                                    @endif
+                                </td>
+                                <td class="text-end">
+                                    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
+                                        data-bs-target="#saleDetailModal-{{ $sale->id }}">
+                                        Xem chi tiết
+                                    </button>
+                                </td>
+                            </tr>
+                            <!-- Modal xem chi tiết hoá đơn -->
+                            <div class="modal fade" id="saleDetailModal-{{ $sale->id }}" tabindex="-1"
+                                aria-labelledby="saleDetailModalLabel-{{ $sale->id }}" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title fw-bold" id="saleDetailModalLabel-{{ $sale->id }}">
+                                                Hóa đơn #{{ $sale->id }}
+                                            </h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="mb-3">
+                                                <div class="small text-muted">Ngày bán</div>
+                                                <div>{{ $sale->created_at->format('d/m/Y H:i') }}</div>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <div class="small text-muted">Sản phẩm</div>
+                                                <div class="fw-semibold">{{ $sale->product->name }}</div>
+                                                <div class="small text-muted">
+                                                    Số lượng: {{ $sale->quantity }} |
+                                                    Đơn giá: {{ number_format($sale->price) }}đ
+                                                </div>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <div class="small text-muted">Thông tin khách hàng</div>
+                                                <div>
+                                                    <strong>{{ $sale->customer?->name ?? 'Khách lẻ' }}</strong><br>
+                                                    @if ($sale->customer?->phone)
+                                                        <span class="text-primary fw-semibold">SĐT:
+                                                            {{ $sale->customer->phone }}</span><br>
+                                                    @endif
+                                                    @if ($sale->customer?->address)
+                                                        <small class="text-muted">Địa chỉ:
+                                                            {{ $sale->customer->address }}</small><br>
+                                                    @endif
+                                                    @if ($sale->customer?->relative_name)
+                                                        <small class="text-muted">Người thân:
+                                                            {{ $sale->customer->relative_name }}</small><br>
+                                                    @endif
+                                                    @if ($sale->customer?->debt && $sale->customer->debt->total_debt > 0)
+                                                        <small class="text-danger fw-semibold">Tổng nợ hiện tại:
+                                                            {{ number_format($sale->customer->debt->total_debt) }}đ</small>
+                                                    @endif
+                                                </div>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <div class="small text-muted">Thanh toán</div>
+                                                <div class="d-flex justify-content-between">
+                                                    <span>Tổng tiền hóa đơn:</span>
+                                                    <span class="fw-semibold">{{ number_format($sale->total) }}đ</span>
+                                                </div>
+                                                <div class="d-flex justify-content-between">
+                                                    <span>Khách đã trả:</span>
+                                                    <span>{{ number_format($sale->paid_amount ?? 0) }}đ</span>
+                                                </div>
+                                                <div class="d-flex justify-content-between">
+                                                    <span>Còn nợ lại:</span>
+                                                    <span
+                                                        class="{{ $sale->debt > 0 ? 'text-danger fw-bold' : 'text-success' }}">
+                                                        {{ number_format($sale->debt) }}đ
+                                                    </span>
+                                                </div>
+                                                <div class="mt-2">
+                                                    @if ($sale->debt > 0)
+                                                        <span class="badge bg-warning text-dark">Đang còn nợ</span>
+                                                    @else
+                                                        <span class="badge bg-success">Đã thanh toán đủ</span>
+                                                    @endif
+                                                </div>
+                                            </div>
+
+                                            @if ($sale->customer && $sale->customer->debt && $sale->customer->debt->total_debt > 0)
+                                                <hr>
+                                                <div class="mb-0">
+                                                    <div class="small fw-bold text-muted mb-2">Trả nợ</div>
+                                                    <form action="{{ route('admin.debt.pay') }}" method="POST"
+                                                        class="d-flex gap-2 align-items-end flex-wrap">
+                                                        @csrf
+                                                        <input type="hidden" name="customer_id" value="{{ $sale->customer->id }}">
+                                                        <div class="flex-grow-1">
+                                                            <label class="form-label small mb-0">Số tiền trả (đ)</label>
+                                                            <input type="number" name="amount" class="form-control form-control-sm"
+                                                                min="1" max="{{ $sale->customer->debt->total_debt }}"
+                                                                placeholder="Tối đa {{ number_format($sale->customer->debt->total_debt) }}đ"
+                                                                required>
+                                                        </div>
+                                                        <div>
+                                                            <label class="form-label small mb-0">&nbsp;</label>
+                                                            <button type="submit" class="btn btn-success btn-sm">
+                                                                <i class="fa-solid fa-money-bill-transfer me-1"></i> Ghi
+                                                                nhận trả nợ
+                                                            </button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            @endif
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-light border"
+                                                data-bs-dismiss="modal">Đóng</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
                     </tbody>
                 </table>
             </div>
         </div>
-
     </div>
 @endsection

@@ -5,9 +5,12 @@
     background-color: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    padding: 1rem 0;
+    // padding: 1rem 0;
     transition: $transition-speed;
 
+    .navbar-logo {
+        width: 70px;
+    }
     .navbar-brand {
         font-weight: 700;
         font-size: 1.5rem;

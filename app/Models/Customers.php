@@ -23,7 +23,8 @@ class Customers extends Model
 
     public function debt()
     {
-        return $this->hasOne(Customer_Debts::class);
+        // Khóa ngoại trong bảng customer__debts là customer_id
+        return $this->hasOne(Customer_Debts::class, 'customer_id');
     }
 
     public function debtTransactions()

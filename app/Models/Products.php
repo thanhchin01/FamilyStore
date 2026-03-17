@@ -35,7 +35,8 @@ class Products extends Model
     // Sản phẩm có nhiều lần nhập hàng
     public function imports()
     {
-        return $this->hasMany(Imports::class);
+        // ✅ Sửa foreign key: cột trong bảng imports là product_id (không phải products_id)
+        return $this->hasMany(Imports::class, 'product_id');
     }
 
     // Sản phẩm có nhiều lần bán

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\SaleController;
+use App\Http\Controllers\Admin\ImportController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
@@ -49,10 +50,12 @@ Route::prefix('admin')
             ->middleware('auth');
         Route::get('/sales/history', [AdminController::class, 'saleHistory']);
         Route::get('/customers/find-by-phone', [AdminController::class, 'findCustomerByPhone']);
+        Route::post('/debt/pay', [AdminController::class, 'payDebt'])->name('debt.pay');
 
         Route::get('/history', [AdminController::class, 'history'])->name('history');
         Route::get('/debt', [AdminController::class, 'debt'])->name('debt');
         Route::get('/stock', [AdminController::class, 'stock'])->name('stock');
+        Route::post('/stock', [ImportController::class, 'store'])->name('stock.store'); // ✅ Added: nhập kho
 
         //Product
         Route::get('/products', [AdminController::class, 'products'])->name('products');
