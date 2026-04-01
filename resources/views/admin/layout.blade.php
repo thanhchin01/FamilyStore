@@ -42,48 +42,58 @@
 
     <!-- Cách 2: Dùng Vite (Chuẩn Laravel) - Đảm bảo đã chạy npm install bootstrap -->
     <!-- @vite(['resources/js/admin/app.js']) -->
-    <script src="{{ asset('vendor/flasher/flasher.min.js') }}"></script>
-    <link rel="stylesheet" href="{{ asset('css/toastr-custom.css?v=999') }}">
+    <!-- SweetAlert2 cho Toasts thay vì f.render() -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 4000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            });
 
-    {{-- <script src="{{ asset('vendor/flasher/toastr.min.js') }}"></script> --}}
-    {{-- {!! flasher_render() !!} --}}
-    {{-- <script src="[https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js](https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js)"></script> --}}
-    {{-- Toastr flash messages from server-side. Push into queue if toastr not ready. --}}
-    {{-- <script>
-        window.__flashQueue = window.__flashQueue || [];
+            @if (session('success'))
+                Toast.fire({
+                    icon: 'success',
+                    title: @json(session('success'))
+                });
+            @endif
 
-        @if (session('success'))
-            window.__flashQueue.push({
-                type: 'success',
-                message: @json(session('success'))
-            });
-        @endif
-        @if (session('error'))
-            window.__flashQueue.push({
-                type: 'error',
-                message: @json(session('error'))
-            });
-        @endif
-        @if (session('warning'))
-            window.__flashQueue.push({
-                type: 'warning',
-                message: @json(session('warning'))
-            });
-        @endif
-        @if (session('info'))
-            window.__flashQueue.push({
-                type: 'info',
-                message: @json(session('info'))
-            });
-        @endif
+            @if (session('error'))
+                Toast.fire({
+                    icon: 'error',
+                    title: @json(session('error'))
+                });
+            @endif
 
-        @if ($errors->any())
-            window.__flashQueue.push({
-                type: 'error',
-                message: @json(implode(' ', $errors->all()))
-            });
-        @endif
-    </script> --}}
+            @if (session('warning'))
+                Toast.fire({
+                    icon: 'warning',
+                    title: @json(session('warning'))
+                });
+            @endif
+
+            @if (session('info'))
+                Toast.fire({
+                    icon: 'info',
+                    title: @json(session('info'))
+                });
+            @endif
+
+            @if ($errors->any())
+                Toast.fire({
+                    icon: 'error',
+                    title: @json($errors->first())
+                });
+            @endif
+        });
+    </script>
     @stack('scripts')
 </body>
 

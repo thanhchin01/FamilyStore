@@ -8,12 +8,18 @@ class Customers extends Model
 {
     //
     protected $fillable = [
+        'user_id',
         'name',
         'phone',
         'address',
         'relative_name',
         'note',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     // 1 khách có thể mua nhiều lần
     public function sales()

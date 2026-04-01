@@ -143,7 +143,7 @@ document.addEventListener('DOMContentLoaded', function() {
             Array.from(productSelect.options).forEach(option => {
                 if(option.value === "") return; // Bỏ qua option mặc định
                 const optCat = option.getAttribute('data-category');
-                option.hidden = (categoryId && categoryId !== "-- Chọn loại hàng --") ? (optCat !== categoryId) : false;
+                option.hidden = categoryId ? (optCat !== categoryId) : false;
             });
             productSelect.value = "";
             updatePriceFromProduct();

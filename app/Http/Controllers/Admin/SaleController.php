@@ -27,12 +27,12 @@ class SaleController extends Controller
         if ($hasItemsArray) {
             // ✅ Bán nhiều sản phẩm trong 1 lần submit (items[])
             $request->validate([
-                'customer_type' => 'required|in:guest,customer',
-                'paid_amount'   => 'nullable|integer|min:0',
-                'items'         => 'required|array|min:1',
-                'items.*.product_id' => 'required|exists:products,id',
-                'items.*.quantity'   => 'required|integer|min:1',
-                'items.*.price'      => 'required|integer|min:0',
+                'customer_type'         => 'required|in:guest,customer',
+                'paid_amount'           => 'nullable|integer|min:0',
+                'items'                 => 'required|array|min:1',
+                'items.*.product_id'    => 'required|exists:products,id',
+                'items.*.quantity'      => 'required|integer|min:1',
+                'items.*.price'         => 'required|integer|min:0',
             ]);
         } else {
             // ✅ Fallback: chỉ bán 1 sản phẩm (cách cũ)

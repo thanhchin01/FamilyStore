@@ -13,9 +13,10 @@ use App\Http\Controllers\AuthController;
 |--------------------------------------------------------------------------
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [App\Http\Controllers\StoreController::class, 'home'])->name('store.home');
+Route::get('/product/{slug}', [App\Http\Controllers\StoreController::class, 'productDetail'])->name('store.products.show');
+Route::get('/cart', [App\Http\Controllers\StoreController::class, 'cart'])->name('store.cart');
+
 
 /*
 |--------------------------------------------------------------------------

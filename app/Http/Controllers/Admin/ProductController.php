@@ -41,30 +41,38 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
+        // Validate dữ liệu đầu vào khi thêm sản phẩm
         $request->validate([
             'name'             => 'required|string|max:255',
-            'category_id'      => 'required|string|max:100',
+            'category_id'      => 'required|integer|exists:categories,id',
             'brand'            => 'required|string|max:100',
-            'model'            => 'nullable|string|max:100',
+            'model'            => 'nullable|string|max:100|unique:products,model',
             'warranty_months'  => 'nullable|integer|min:0',
             'price'            => 'required|integer|min:0',
             'stock'            => 'required|integer|min:0',
             'description'      => 'nullable|string',
+        ], [
+            'model.unique' => 'Sản phẩm này đã được nhập.',
         ]);
 
-        Products::create([
+        $product = Products::create([
             'name'                  => $request->name,
-            // 'slug' => Str::slug($request->name),
             'slug'                  => $this->generateUniqueSlug($request->name),
             'category_id'           => $request->category_id,
             'brand'                 => $request->brand,
             'model'                 => $request->model,
             'price'                 => $request->price,
             'warranty_months'       => $request->warranty_months ?? 0,
-            'stock'                 => $request->stock,
+            'stock'                 => 0, // Khởi tạo bằng 0, inventory service sẽ cộng lên
             'description'           => $request->description,
             'is_active'             => true,
         ]);
+
+        // Nếu có số lượng tồn đầu kỳ > 0, ghi nhận vào kho
+        if ($request->stock > 0) {
+            $inventoryService = app(\App\Services\InventoryService::class);
+            $inventoryService->importProduct($product->id, (int) $request->stock, 'Khởi tạo tồn kho khi thêm sản phẩm');
+        }
 
         return redirect()
             ->back()
@@ -74,24 +82,23 @@ class ProductController extends Controller
     // Cập nhật sản phẩm
     public function update(Request $request, $slug)
     {
+        $product = Products::where('slug', $slug)->firstOrFail();
+
         $request->validate([
-            // 'id' => 'required|exists:products,id',
             'name'              => 'required|string|max:255',
-            // 'category_id'       => 'required|string|max:100',
-            'category_id'     => 'required|integer|exists:categories,id',
+            'category_id'       => 'required|integer|exists:categories,id',
             'brand'             => 'required|string|max:100',
-            'model'             => 'nullable|string|max:100',
+            'model'             => 'nullable|string|max:100|unique:products,model,' . $product->id,
             'warranty_months'   => 'nullable|integer|min:0',
             'price'             => 'required|integer|min:0',
             'stock'             => 'required|integer|min:0',
             'description'       => 'nullable|string',
+        ], [
+            'model.unique' => 'Sản phẩm này đã được nhập.',
         ]);
 
-        // $product = Products::findOrFail($request->id);
-        $product = Products::where('slug', $slug)->firstOrFail();
         $product->update([
             'name'            => $request->name,
-            // 'slug' => Str::slug($request->name),
             'slug'            => $this->generateUniqueSlug($request->name, $product->id),
             'category_id'     => $request->category_id,
             'brand'           => $request->brand,
@@ -100,8 +107,6 @@ class ProductController extends Controller
             'price'           => $request->price,
             'stock'           => $request->stock,
             'description'     => $request->description,
-            // 'is_active'        => true,
-
         ]);
 
         return redirect()
@@ -115,7 +120,8 @@ class ProductController extends Controller
     public function disable($slug)
     {
         $product = Products::findOrFail($slug);
-
+        // Sửa lỗi: findOrFail tìm theo ID, cần tìm theo slug
+        // $product = Products::where('slug', $slug)->firstOrFail();
         $product->update([
             'is_active' => false
         ]);
@@ -131,6 +137,8 @@ class ProductController extends Controller
     public function destroy($slug)
     {
         $product = Products::findOrFail($slug);
+        // Sửa lỗi: findOrFail tìm theo ID, cần tìm theo slug
+        // $product = Products::where('slug', $slug)->firstOrFail();
         $product->delete();
 
         return redirect()

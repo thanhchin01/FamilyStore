@@ -1,5 +1,6 @@
 // import './bootstrap';
 import 'bootstrap';
+import { animate } from 'animejs';
 // import {
 //     runCounter
 // } from './anime';

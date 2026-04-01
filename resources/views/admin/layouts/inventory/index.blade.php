@@ -5,9 +5,9 @@
 @section('content')
     <div class="inventory-wrapper py-4">
         @php
-            $countOutOfStock = $products->where('stock_quantity', '<=', 0)->count();
-            $countLowStock = $products->where('stock_quantity', '>', 0)->where('stock_quantity', '<=', 5)->count();
-            $countInStock = $products->where('stock_quantity', '>', 5)->count();
+            $countOutOfStock = $products->where('stock', '<=', 0)->count();
+            $countLowStock = $products->where('stock', '>', 0)->where('stock', '<=', 5)->count();
+            $countInStock = $products->where('stock', '>', 5)->count();
         @endphp
         <!-- Header -->
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -48,7 +48,7 @@
                     <tbody>
                         @forelse($products as $product)
                             @php
-                                $stock = $product->stock_quantity ?? 0;
+                                $stock = $product->stock ?? 0;
                                 $statusClass = 'success';
                                 $statusText = 'Còn hàng';
                                 $signalClass = 'signal-success';
@@ -78,7 +78,7 @@
                                         <div>
                                             <div class="fw-bold text-dark">{{ $product->name }}</div>
                                             <span class="text-muted small">Mã:
-                                                SP-{{ str_pad($product->id, 5, '0', STR_PAD_LEFT) }}</span>
+                                                {{ $product->model ?? 'SP-' . str_pad($product->id, 5, '0', STR_PAD_LEFT) }}</span>
                                         </div>
                                     </div>
                                 </td>

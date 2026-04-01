@@ -1,11 +1,7 @@
-// import anime from 'animejs';
+import anime from 'animejs/lib/anime.es.js';
 
-// export function runCounter() {
-//     anime({
-//         targets: '.counter',
-//         innerHTML: [0, 1000],
-//         easing: 'easeOutExpo',
-//         round: 1,
-//         duration: 1500
-//     });
-// }
+anime({
+  targets: '.box',
+  translateX: 250,
+  duration: 800
+});

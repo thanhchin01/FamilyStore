@@ -23,7 +23,7 @@
                             <div class="col-md-6">
                                 <label class="form-label-custom">Loại sản phẩm</label>
                                 <select id="categorySelect" class="form-select border-light-subtle shadow-sm">
-                                    <option selected>-- Chọn loại hàng --</option>
+                                    <option value="" selected>-- Chọn loại hàng --</option>
                                     @foreach ($categories as $category)
                                         <option value="{{ $category->id }}">
                                             {{ $category->name }}
@@ -35,12 +35,13 @@
                             <!-- Chọn sản phẩm cụ thể -->
                             <div class="col-md-6">
                                 <label class="form-label-custom">Sản phẩm (Hãng)</label>
-                                {{-- <select name="product_id" id="productSelect" class="form-select border-light-subtle shadow-sm" required>
+                                {{-- <select name="product_id" id="productSelect"
+                                    class="form-select border-light-subtle shadow-sm" required>
                                     <option selected>-- Chọn sản phẩm --</option>
                                     @foreach ($products as $product)
-                                        <option value="{{ $product->id }}" data-price="{{ $product->price }}">
-                                            {{ $product->name }} ({{ number_format($product->price) }}đ)
-                                        </option>
+                                    <option value="{{ $product->id }}" data-price="{{ $product->price }}">
+                                        {{ $product->name }} ({{ number_format($product->price) }}đ)
+                                    </option>
                                     @endforeach
                                 </select> --}}
                                 {{-- ✅ Updated: vẫn giữ name để backend fallback được khi chỉ bán 1 sản phẩm --}}
@@ -71,8 +72,7 @@
                                 {{-- <input type="text" class="form-control fw-bold text-primary" value="1,200,000">
                                 --}}
                                 {{-- ✅ Updated: vẫn giữ name để backend fallback được khi chỉ bán 1 sản phẩm --}}
-                                <input type="number" id="priceInput" name="price"
-                                    class="form-control fw-bold text-primary">
+                                <input type="number" id="priceInput" name="price" class="form-control fw-bold text-primary">
                                 <div class="form-text">Mặc định từ hệ thống: <span id="systemPriceText">0đ</span></div>
                             </div>
                         </div>
@@ -147,8 +147,8 @@
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label-custom">Địa chỉ</label>
-                                    <input name="customer_address" id="customerAddress" type="text"
-                                        class="form-control" placeholder="Địa chỉ (tùy chọn)">
+                                    <input name="customer_address" id="customerAddress" type="text" class="form-control"
+                                        placeholder="Địa chỉ (tùy chọn)">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label-custom">Tên người thân</label>
@@ -182,8 +182,7 @@
                                     <div class="col-md-6">
                                         <div class="small text-muted mb-1">Còn nợ lại (đ)</div>
                                         <input type="text" id="debtAmountInput"
-                                            class="form-control form-control-sm text-danger fw-bold" value="0"
-                                            readonly>
+                                            class="form-control form-control-sm text-danger fw-bold" value="0" readonly>
                                     </div>
                                 </div>
                             </div>
@@ -343,8 +342,7 @@
                                 <div class="modal-dialog modal-dialog-centered">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h5 class="modal-title fw-bold"
-                                                id="saleDetailModalLabel-{{ $first->id }}">
+                                            <h5 class="modal-title fw-bold" id="saleDetailModalLabel-{{ $first->id }}">
                                                 Hóa đơn #{{ $first->id }}
                                             </h5>
                                             <button type="button" class="btn-close" data-bs-dismiss="modal"
@@ -405,8 +403,7 @@
                                                 </div>
                                                 <div class="d-flex justify-content-between">
                                                     <span>Còn nợ lại:</span>
-                                                    <span
-                                                        class="{{ $debt > 0 ? 'text-danger fw-bold' : 'text-success' }}">
+                                                    <span class="{{ $debt > 0 ? 'text-danger fw-bold' : 'text-success' }}">
                                                         {{ number_format($debt) }}đ
                                                     </span>
                                                 </div>
@@ -426,13 +423,11 @@
                                                     <form action="{{ route('admin.debt.pay') }}" method="POST"
                                                         class="d-flex gap-2 align-items-end flex-wrap">
                                                         @csrf
-                                                        <input type="hidden" name="customer_id"
-                                                            value="{{ $first->customer->id }}">
+                                                        <input type="hidden" name="customer_id" value="{{ $first->customer->id }}">
                                                         <div class="flex-grow-1">
                                                             <label class="form-label small mb-0">Số tiền trả (đ)</label>
-                                                            <input type="number" name="amount"
-                                                                class="form-control form-control-sm" min="1"
-                                                                max="{{ $first->customer->debt->total_debt }}"
+                                                            <input type="number" name="amount" class="form-control form-control-sm"
+                                                                min="1" max="{{ $first->customer->debt->total_debt }}"
                                                                 placeholder="Tối đa {{ number_format($first->customer->debt->total_debt) }}đ"
                                                                 required>
                                                         </div>
