@@ -32,13 +32,14 @@ Nhung de phat trien them ecommerce va auth khach hang, schema hien tai gap 4 van
 
 ## 2. Dinh huong thiet ke moi
 
-Schema V2 tach ro 5 nhom:
+Schema V2 tach ro 6 nhom:
 
 - `catalog`: danh muc, san pham, anh san pham
 - `identity`: tai khoan, profile khach, dia chi
 - `commerce`: gio hang, don hang, item, payment, history
 - `pos`: hoa don tai quay, item, payment, cong no
 - `inventory`: phieu nhap, dong nhap, so kho
+- `engagement`: chat, thong bao, danh gia
 
 Huong nay giup:
 
@@ -182,24 +183,47 @@ Neu ban chi can them 1 anh phu trong giai doan dau:
 
 ### 3.3 Gio hang va dat hang online
 
-#### `cart_items`
+#### `carts`
 
-Giữ bang nay, bo sung rang buoc:
+File Word cua ban dang di theo mo hinh `users -> carts -> cart_items`.
+
+De xuat:
 
 - `id`
 - `user_id`, FK -> `users.id`
-- `product_id`, FK -> `products.id`
-- `quantity`
+- `status` enum: `active`, `converted`, `abandoned`
 - `created_at`
 - `updated_at`
 
 Rang buoc:
 
-- unique (`user_id`, `product_id`)
+- unique (`user_id`, `status`) cho truong hop chi cho 1 cart `active` tai mot thoi diem
 
 Vai tro:
 
-- Moi user chi co 1 dong cart cho 1 san pham.
+- Phu hop hon `cart_items` gan truc tiep vao `users` neu sau nay muon luu lich su cart, merge cart, guest cart.
+- Bám sat hon voi file Word ban da thiet ke.
+
+#### `cart_items`
+
+De xuat cap nhat theo mo hinh cart header:
+
+- `id`
+- `cart_id`, FK -> `carts.id`
+- `product_id`, FK -> `products.id`
+- `quantity`
+- `unit_price_snapshot`
+- `created_at`
+- `updated_at`
+
+Rang buoc:
+
+- unique (`cart_id`, `product_id`)
+
+Vai tro:
+
+- Moi cart chi co 1 dong cho 1 san pham.
+- `unit_price_snapshot` giup hien thi gia trong gio tai thoi diem them, du business van nen recalculate luc checkout.
 
 #### `orders`
 
@@ -305,7 +329,88 @@ Vai tro:
 - Khong nen nhet het chi tiet thanh toan vao `orders`.
 - Phu hop khi sau nay tich hop VNPay, Momo, chuyen khoan, QR.
 
-### 3.4 POS va hoa don tai quay
+Luu y voi file Word:
+
+- Bang `payments` trong Word la dung huong.
+- Trong schema V2, toi de ten `order_payments` de ro no thuoc don online, tranh nham voi `sale_payments` cua POS.
+
+### 3.4 Engagement cho online
+
+#### `conversations`
+
+Bang moi cho chat voi shop:
+
+- `id`
+- `user_id`, FK -> `users.id`
+- `status` enum: `open`, `closed`
+- `last_message_at` nullable
+- `created_at`
+- `updated_at`
+
+Vai tro:
+
+- 1 user co the co nhieu conversation.
+- De admin theo doi tung luong chat.
+
+#### `messages`
+
+Bang moi cho tin nhan:
+
+- `id`
+- `conversation_id`, FK -> `conversations.id`
+- `sender_id`, FK -> `users.id`
+- `message`
+- `is_read`
+- `created_at`
+- `updated_at`
+
+Vai tro:
+
+- User va admin deu gui trong cung mot bang.
+- Du de build inbox chat co danh dau da doc.
+
+#### `notifications`
+
+Bang moi cho thong bao:
+
+- `id`
+- `user_id`, FK -> `users.id`
+- `type` nullable
+- `title`
+- `content`
+- `is_read`
+- `created_at`
+- `updated_at`
+
+Vai tro:
+
+- Gui thong bao khi admin xac nhan don, giao hang, huy don.
+- Bám sat flow trong file Word.
+
+#### `reviews`
+
+Bang moi cho danh gia san pham:
+
+- `id`
+- `user_id`, FK -> `users.id`
+- `product_id`, FK -> `products.id`
+- `order_item_id` nullable, FK -> `order_items.id`
+- `rating`
+- `comment` nullable
+- `is_visible`
+- `created_at`
+- `updated_at`
+
+Rang buoc:
+
+- Co the them unique (`user_id`, `product_id`, `order_item_id`) neu muon moi lan mua chi review 1 lan.
+
+Vai tro:
+
+- Ho tro ecommerce dung nghia.
+- `order_item_id` giup rang buoc chi nguoi da mua moi duoc review.
+
+### 3.5 POS va hoa don tai quay
 
 #### `sale_invoices`
 
@@ -364,7 +469,7 @@ Vai tro:
 - Ho tro partial payment.
 - Mot hoa don co the thu nhieu lan bang nhieu hinh thuc.
 
-### 3.5 Cong no
+### 3.6 Cong no
 
 #### `customer_debt_balances`
 
@@ -402,7 +507,7 @@ Vai tro:
 - Ledger cong no.
 - Giao dich cong no gan voi hoa don, khong gan voi mot dong san pham nhu `sale_id` hien tai.
 
-### 3.6 Kho va ton kho
+### 3.7 Kho va ton kho
 
 #### `import_receipts`
 
@@ -463,8 +568,11 @@ Vai tro:
 | `debt__transactions` | Dang gan vao `sale_id` cap dong | `debt_transactions` gan vao `sale_invoice_id` |
 | `products.image` | Chi co 1 anh | `products.thumbnail_image` + `product_images` |
 | `orders` | Chua du thong tin online | `orders`, `order_items`, `order_addresses`, `order_payments`, `order_status_histories` |
-| `cart_items` | Chua co unique theo user va product | `cart_items` giu nguyen, them unique |
+| `cart_items` | Hien tai gan truc tiep user, kho mo rong | `carts` + `cart_items` |
 | `customers` | Chua ro cho online auth va dia chi | `customers` + `customer_addresses` |
+| Chua co | Chat voi shop | `conversations`, `messages` |
+| Chua co | Thong bao cho user | `notifications` |
+| Chua co | Danh gia san pham | `reviews` |
 
 ## 5. Quan he chinh
 
@@ -476,7 +584,8 @@ erDiagram
     CATEGORIES ||--o{ PRODUCTS : contains
     PRODUCTS ||--o{ PRODUCT_IMAGES : has
 
-    USERS ||--o{ CART_ITEMS : has
+    USERS ||--o{ CARTS : has
+    CARTS ||--o{ CART_ITEMS : has
     PRODUCTS ||--o{ CART_ITEMS : in_cart
 
     USERS ||--o{ ORDERS : places
@@ -502,20 +611,31 @@ erDiagram
     PRODUCTS ||--o{ IMPORT_ITEMS : received_as
 
     PRODUCTS ||--o{ INVENTORY_MOVEMENTS : moves
+    USERS ||--o{ CONVERSATIONS : starts
+    CONVERSATIONS ||--o{ MESSAGES : has
+    USERS ||--o{ MESSAGES : sends
+    USERS ||--o{ NOTIFICATIONS : receives
+    USERS ||--o{ REVIEWS : writes
+    PRODUCTS ||--o{ REVIEWS : receives
 ```
 
 ## 6. Rang buoc va index toi thieu
 
+- `carts`: unique (`user_id`, `status`) cho cart `active`
 - `users.email` unique
 - `users.phone` unique neu dung de login
 - `customers.customer_code` unique
 - `products.slug` unique
 - `products.sku` unique
 - `product_images`: index (`product_id`, `sort_order`)
-- `cart_items`: unique (`user_id`, `product_id`)
+- `cart_items`: unique (`cart_id`, `product_id`)
 - `orders.order_code` unique
 - `order_items`: index (`order_id`), (`product_id`)
 - `order_payments`: index (`order_id`, `status`)
+- `conversations`: index (`user_id`, `status`)
+- `messages`: index (`conversation_id`, `created_at`)
+- `notifications`: index (`user_id`, `is_read`)
+- `reviews`: index (`product_id`, `created_at`)
 - `sale_invoices.invoice_code` unique
 - `sale_items`: index (`sale_invoice_id`), (`product_id`)
 - `sale_payments`: index (`sale_invoice_id`, `paid_at`)
@@ -532,13 +652,18 @@ Khong nen rewrite mot lan. Nen chia 3 phase:
 ### Phase 1: Nang cap ecommerce
 
 - Them `product_images`
+- Them `carts`
 - Nang cap `orders`
 - Nang cap `order_items`
 - Them `customer_addresses`
 - Them `order_addresses`
 - Them `order_payments`
 - Them `order_status_histories`
-- Rang buoc unique cho `cart_items`
+- Them `conversations`
+- Them `messages`
+- Them `notifications`
+- Them `reviews`
+- Chuyen `cart_items` sang FK `cart_id`
 
 Muc tieu:
 
@@ -582,7 +707,11 @@ Thi schema V2 nen di theo huong:
 
 - `products` + `product_images`
 - `users` + `customers` + `customer_addresses`
+- `carts` + `cart_items`
 - `orders` + `order_items` + `order_addresses` + `order_payments` + `order_status_histories`
+- `conversations` + `messages`
+- `notifications`
+- `reviews`
 - `sale_invoices` + `sale_items` + `sale_payments`
 - `import_receipts` + `import_items`
 - `inventory_movements`

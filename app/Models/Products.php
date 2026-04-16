@@ -11,13 +11,19 @@ class Products extends Model
         'category_id',
         'name',
         'slug',
+        'sku',
         'image',
+        'thumbnail_image',
         'brand',
         'model',
         'price',
+        'list_price',
+        'sale_price',
         'warranty_months',
         'stock',
         'is_active',
+        'short_description',
+        'is_featured',
         'description'
     ];
 
@@ -53,5 +59,30 @@ class Products extends Model
     public function orderItems()
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function productImages()
+    {
+        return $this->hasMany(ProductImage::class, 'product_id');
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class, 'product_id');
+    }
+
+    public function saleItems()
+    {
+        return $this->hasMany(SaleItem::class, 'product_id');
+    }
+
+    public function importItems()
+    {
+        return $this->hasMany(ImportItem::class, 'product_id');
+    }
+
+    public function inventoryMovements()
+    {
+        return $this->hasMany(InventoryMovement::class, 'product_id');
     }
 }

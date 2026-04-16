@@ -4,32 +4,24 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class OrderItem extends Model
+class SaleItem extends Model
 {
     protected $fillable = [
-        'order_id',
+        'sale_invoice_id',
         'product_id',
         'product_name_snapshot',
-        'product_sku_snapshot',
-        'product_image_snapshot',
         'quantity',
-        'price',
         'unit_price',
         'line_total',
     ];
 
-    public function order()
+    public function invoice()
     {
-        return $this->belongsTo(Order::class);
+        return $this->belongsTo(SaleInvoice::class, 'sale_invoice_id');
     }
 
     public function product()
     {
         return $this->belongsTo(Products::class, 'product_id');
-    }
-
-    public function reviews()
-    {
-        return $this->hasMany(Review::class, 'order_item_id');
     }
 }

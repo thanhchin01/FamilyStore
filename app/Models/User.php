@@ -23,11 +23,19 @@ class User extends Authenticatable
         'password',
         'role',
         'phone',
+        'address',
+        'status',
+        'last_login_at',
     ];
 
     public function customerProfile()
     {
         return $this->hasOne(Customers::class, 'user_id');
+    }
+
+    public function carts()
+    {
+        return $this->hasMany(Cart::class);
     }
 
     public function cartItems()
@@ -38,6 +46,41 @@ class User extends Authenticatable
     public function orders()
     {
         return $this->hasMany(Order::class);
+    }
+
+    public function conversations()
+    {
+        return $this->hasMany(Conversation::class);
+    }
+
+    public function sentMessages()
+    {
+        return $this->hasMany(Message::class, 'sender_id');
+    }
+
+    public function storeNotifications()
+    {
+        return $this->hasMany(StoreNotification::class);
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    public function saleInvoices()
+    {
+        return $this->hasMany(SaleInvoice::class, 'created_by');
+    }
+
+    public function importReceipts()
+    {
+        return $this->hasMany(ImportReceipt::class, 'created_by');
+    }
+
+    public function inventoryMovements()
+    {
+        return $this->hasMany(InventoryMovement::class, 'created_by');
     }
 
     /**
@@ -59,6 +102,7 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'last_login_at' => 'datetime',
             'password' => 'hashed',
         ];
     }
