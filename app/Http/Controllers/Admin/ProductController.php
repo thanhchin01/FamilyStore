@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Products;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use App\Http\Requests\Admin\Product\StoreProductRequest;
+use App\Http\Requests\Admin\Product\UpdateProductRequest;
 
 class ProductController extends Controller
 {
@@ -39,22 +41,8 @@ class ProductController extends Controller
     /**
      * Thêm sản phẩm
      */
-    public function store(Request $request)
+    public function store(StoreProductRequest $request)
     {
-        // Validate dữ liệu đầu vào khi thêm sản phẩm
-        $request->validate([
-            'name'             => 'required|string|max:255',
-            'category_id'      => 'required|integer|exists:categories,id',
-            'brand'            => 'required|string|max:100',
-            'model'            => 'nullable|string|max:100|unique:products,model',
-            'warranty_months'  => 'nullable|integer|min:0',
-            'price'            => 'required|integer|min:0',
-            'stock'            => 'required|integer|min:0',
-            'description'      => 'nullable|string',
-        ], [
-            'model.unique' => 'Sản phẩm này đã được nhập.',
-        ]);
-
         $product = Products::create([
             'name'                  => $request->name,
             'slug'                  => $this->generateUniqueSlug($request->name),
@@ -80,22 +68,9 @@ class ProductController extends Controller
     }
 
     // Cập nhật sản phẩm
-    public function update(Request $request, $slug)
+    public function update(UpdateProductRequest $request, $slug)
     {
         $product = Products::where('slug', $slug)->firstOrFail();
-
-        $request->validate([
-            'name'              => 'required|string|max:255',
-            'category_id'       => 'required|integer|exists:categories,id',
-            'brand'             => 'required|string|max:100',
-            'model'             => 'nullable|string|max:100|unique:products,model,' . $product->id,
-            'warranty_months'   => 'nullable|integer|min:0',
-            'price'             => 'required|integer|min:0',
-            'stock'             => 'required|integer|min:0',
-            'description'       => 'nullable|string',
-        ], [
-            'model.unique' => 'Sản phẩm này đã được nhập.',
-        ]);
 
         $product->update([
             'name'            => $request->name,

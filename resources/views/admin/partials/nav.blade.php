@@ -5,7 +5,7 @@
         <a class="navbar-brand text-uppercase" href="{{ route('admin.dashboard') }}">
             {{-- <i class="fa-solid fa-tv"></i>
             KQ Store --}}
-            <img class="navbar-logo" src="{{ asset('images/admin/logo-1.png') }}" alt="KQ Store">
+            {{-- <img class="navbar-logo" src="{{ asset('images/admin/logo-1.png') }}" alt="KQ Store"> --}}
         </a>
 
         <!-- Sidebar Toggle Button -->

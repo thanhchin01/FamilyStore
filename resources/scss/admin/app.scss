@@ -2,6 +2,7 @@
 
 // 1. Variables (Phải import đầu tiên)
 @import 'shared/variables';
+@import 'shared/components';
 
 // 2. Bootstrap (Nếu cài qua npm)
 @import 'bootstrap/scss/bootstrap';
@@ -27,13 +28,22 @@ body {
     flex-direction: column;
     min-height: 100vh;
     overflow-x: hidden;
+    scroll-behavior: smooth;
 }
 
 main {
     flex: 1;
-    margin-top: 80px; // Bù khoảng trống cho fixed navbar
+    margin-top: 100px;
+    margin-bottom: 3rem;
+    animation: fadeIn 0.8s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 a {
     text-decoration: none;
+    transition: color $transition-speed;
 }

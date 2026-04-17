@@ -1,0 +1,305 @@
+@import 'partials/variables';
+@import 'partials/swiper';
+
+// Modern Luxury Theme for Khoa Quyen Store Client
+
+// Global Styles
+body {
+    background-color: $bg-light;
+    color: $text-dark;
+    font-family: 'Outfit', 'Inter', sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+// Typography
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+    letter-spacing: -0.025em;
+}
+
+.section-title {
+    font-size: 2.25rem;
+    margin-bottom: 3rem;
+    position: relative;
+    display: inline-block;
+    
+    &::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 0;
+        width: 60px;
+        height: 4px;
+        background-color: $primary-color;
+        border-radius: 2px;
+    }
+}
+
+// Navbar & Header
+.navbar-custom {
+    background: rgba($white, 0.8) !important;
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    padding: 1rem 0;
+    transition: $transition-base;
+    
+    &.scrolled {
+        padding: 0.6rem 0;
+        box-shadow: $shadow-md;
+    }
+}
+
+.navbar-brand {
+    font-weight: 800;
+    font-size: 1.5rem;
+    color: $primary-color !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    
+    span {
+        color: $accent-color;
+    }
+}
+
+.nav-link {
+    font-weight: 500;
+    color: $text-dark !important;
+    margin: 0 0.5rem;
+    position: relative;
+    
+    &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        width: 0;
+        height: 2px;
+        background-color: $primary-color;
+        transition: $transition-base;
+        transform: translateX(-50%);
+    }
+    
+    &:hover::after, &.active::after {
+        width: 100%;
+    }
+}
+
+// Buttons
+.btn-primary-custom {
+    background: linear-gradient(135deg, $primary-color 0%, $primary-dark 100%);
+    color: $white;
+    border: none;
+    padding: 0.8rem 1.8rem;
+    border-radius: 50px;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba($primary-color, 0.3);
+    transition: $transition-base;
+    
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba($primary-color, 0.4);
+        color: $white;
+    }
+    
+    &:active {
+        transform: translateY(0);
+    }
+}
+
+// Product Cards
+.product-card {
+    background: $white;
+    border-radius: 20px;
+    padding: 0;
+    border: 1px solid rgba(0,0,0,0.02);
+    box-shadow: $shadow-md;
+    transition: $transition-base;
+    overflow: hidden;
+    height: 100%;
+    
+    &:hover {
+        transform: translateY(-10px);
+        box-shadow: $shadow-xl;
+        
+        .product-img-wrapper img {
+            transform: scale(1.1);
+        }
+        
+        .product-actions {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .product-img-wrapper {
+        position: relative;
+        background-color: #f1f5f9;
+        aspect-ratio: 1/1;
+        overflow: hidden;
+        
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+        
+        .product-actions {
+            position: absolute;
+            bottom: 15px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: $transition-base;
+        }
+    }
+    
+    .product-details {
+        padding: 1.5rem;
+    }
+    
+    .category-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        color: $text-muted;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+    
+    .product-price {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: $primary-color;
+    }
+}
+
+// Hero Section
+.hero-section {
+    padding: 100px 0;
+    background: radial-gradient(circle at top right, rgba($primary-color, 0.1) 0%, transparent 70%),
+                radial-gradient(circle at bottom left, rgba($accent-color, 0.05) 0%, transparent 70%);
+}
+
+// Layout Utils
+.glass-panel {
+    background: rgba($white, 0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba($white, 0.3);
+    border-radius: 24px;
+}
+
+// Footer
+.store-footer {
+    background-color: $bg-dark;
+    color: #94a3b8;
+    padding: 5rem 0 2rem;
+    
+    h5 {
+        color: $white;
+        margin-bottom: 1.5rem;
+    }
+    
+    a {
+        color: #94a3b8;
+        text-decoration: none;
+        transition: $transition-base;
+        
+        &:hover {
+            color: $primary-light;
+            padding-left: 5px;
+        }
+    }
+}
+
+// Premium Toast Notifications
+.premium-toast-container {
+    pointer-events: none;
+    & > * { pointer-events: auto; }
+}
+
+.premium-toast {
+    min-width: 320px;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(15px);
+    border-radius: 16px;
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    margin-bottom: 1rem;
+    border: 1px solid rgba(0,0,0,0.05);
+    animation: slideInRight 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    position: relative;
+    overflow: hidden;
+    
+    &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 6px;
+    }
+    
+    &.success {
+        &::before { background-color: #009688; }
+        .toast-icon { color: #009688; }
+    }
+    
+    &.error {
+        &::before { background-color: #ef4444; }
+        .toast-icon { color: #ef4444; }
+    }
+    
+    .toast-icon {
+        font-size: 1.5rem;
+        flex-shrink: 0;
+    }
+    
+    .toast-body {
+        flex-grow: 1;
+        h6 { font-size: 0.95rem; }
+    }
+    
+    .toast-close {
+        background: none;
+        border: none;
+        color: #64748b;
+        font-size: 1.25rem;
+        cursor: pointer;
+    }
+}
+
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(100px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+// Authentication Modal Styles
+.authentication-sidebar {
+    background: linear-gradient(135deg, #009688 0%, #004d40 100%);
+    position: relative;
+}
+.header-line {
+    width: 50px;
+    height: 3px;
+    background: #fff;
+    margin-top: 10px;
+}
+#authModal .form-control:focus {
+    background: #fff !important;
+    border-color: #009688 !important;
+    box-shadow: none;
+}
+.fw-800 { font-weight: 800; }
+.extra-small {
+    font-size: 0.65rem;
+    letter-spacing: 0.05em;
+}

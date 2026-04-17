@@ -1,0 +1,51 @@
+@import "variables";
+
+// Common Swiper Customization (Luxury Style)
+.swiper-button-next,
+.swiper-button-prev {
+    padding: 10px;
+    color: $primary-color;
+    background: rgba($white, 0.9);
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    box-shadow: $shadow-md;
+    border: 1px solid rgba($primary-color, 0.1);
+    backdrop-filter: blur(10px);
+    transition: $transition-base;
+    display: none; // Hidden by default on small screens
+
+    @media (min-width: 768px) {
+        display: flex;
+    }
+
+    &::after {
+        font-size: 18px;
+        font-weight: 800;
+    }
+
+    &:hover {
+        background: $primary-color;
+        color: $white;
+        box-shadow: $shadow-lg;
+        transform: scale(1.1);
+    }
+}
+
+.swiper-pagination-bullet {
+    background: rgba($text-dark, 0.3);
+    border-radius: 4px;
+    transition: $transition-base;
+    opacity: 0.5;
+
+    &-active {
+        width: 25px;
+        background: $primary-color;
+        opacity: 1;
+    }
+}
+
+// Utility for Slider Spacing
+.swiper-pb-5 {
+    padding-bottom: 60px !important;
+}

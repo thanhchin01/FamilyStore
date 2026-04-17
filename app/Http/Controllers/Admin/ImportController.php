@@ -8,31 +8,20 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
+use App\Http\Requests\Admin\Import\StoreImportRequest;
+
 class ImportController extends Controller
 {
-    public function store(Request $request, InventoryService $inventoryService)
+    public function store(StoreImportRequest $request, InventoryService $inventoryService)
     {
         // ✅ Cho phép: nếu không có items[] thì dùng 1 dòng product_id + quantity
         // Kiểm tra xem request gửi lên là mảng nhiều sản phẩm hay chỉ 1 sản phẩm lẻ
         $hasItemsArray = $request->has('items') && is_array($request->items);
 
         if ($hasItemsArray) {
-            // Trường hợp nhập nhiều dòng cùng lúc
-            $request->validate([
-                'note' => 'nullable|string|max:1000',
-                'items' => 'required|array|min:1',
-                'items.*.product_id' => 'required|exists:products,id',
-                'items.*.quantity' => 'required|integer|min:1',
-            ]);
             // Gán biến items từ mảng gửi lên
             $items = $request->items;
         } else {
-            // Trường hợp nhập 1 dòng lẻ (fallback cho code cũ hoặc form đơn giản)
-            $request->validate([
-                'note' => 'nullable|string|max:1000',
-                'product_id' => 'required|exists:products,id',
-                'quantity' => 'required|integer|min:1',
-            ]);
             // Chuẩn hóa thành mảng để xử lý chung logic phía dưới
             $items = [[
                 'product_id' => $request->product_id,

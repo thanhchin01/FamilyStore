@@ -1,70 +1,89 @@
 // resources/scss/_nav.scss
 
 .custom-navbar {
-    z-index: 1;
-    background-color: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    // padding: 1rem 0;
-    transition: $transition-speed;
+    z-index: 100; // Ensure it's above other elements
+    background: $glass-bg;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid $glass-border;
+    box-shadow: $box-shadow;
+    padding: 0.75rem 0;
+    transition: all $transition-speed ease;
 
     .navbar-logo {
-        width: 70px;
+        width: 60px;
+        filter: drop-shadow(0 0 5px rgba($primary-color, 0.2));
     }
+
     .navbar-brand {
-        font-weight: 700;
-        font-size: 1.5rem;
+        font-family: "Outfit", sans-serif;
+        font-weight: 800;
+        font-size: 1.6rem;
         color: $primary-color;
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 12px;
+        letter-spacing: -0.5px;
 
         i {
-            font-size: 1.8rem;
+            font-size: 2rem;
+            background: linear-gradient(135deg, $primary-color, $success-color);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
     }
 
     .nav-link {
-        font-weight: 500;
+        font-family: "Outfit", sans-serif;
+        font-weight: 600;
         color: $text-main;
-        margin: 0 10px;
+        margin: 0 15px;
         position: relative;
+        padding: 8px 0;
         transition: color $transition-speed;
 
-        &:hover, &.active {
-            color: $primary-color;
+        &:hover,
+        &.active {
+            color: $primary-hover;
         }
 
-        // Hiệu ứng gạch chân
         &::after {
-            content: '';
+            content: "";
             position: absolute;
             width: 0;
-            height: 2px;
+            height: 3px;
             bottom: 0;
-            left: 50%;
-            background-color: $primary-color;
-            transition: all $transition-speed;
-            transform: translateX(-50%);
+            left: 0;
+            background: linear-gradient(
+                to right,
+                $primary-color,
+                $success-color
+            );
+            border-radius: 5px;
+            transition: width $transition-speed
+                cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        &:hover::after, &.active::after {
+        &:hover::after,
+        &.active::after {
             width: 100%;
         }
     }
 
     .btn-sidebar-toggle {
         border: none;
-        background: transparent;
-        font-size: 1.5rem;
-        color: $text-main;
-        padding: 5px;
+        background: rgba($primary-color, 0.1);
+        border-radius: 10px;
+        font-size: 1.4rem;
+        color: $primary-color;
+        padding: 8px 12px;
         cursor: pointer;
-        transition: transform $transition-speed;
+        transition: all $transition-speed;
 
         &:hover {
-            color: $primary-color;
-            transform: rotate(90deg);
+            background: $primary-color;
+            color: #fff;
+            transform: scale(1.05);
         }
     }
 }

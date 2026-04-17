@@ -10,6 +10,8 @@ use App\Services\SaleService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+use App\Http\Requests\Admin\Sale\StoreSaleRequest;
+
 class SaleController extends Controller
 {
     //
@@ -20,30 +22,9 @@ class SaleController extends Controller
         $this->saleService = $saleService;
     }
 
-    public function store(Request $request)
+    public function store(StoreSaleRequest $request)
     {
         $hasItemsArray = $request->has('items') && is_array($request->items);
-
-        if ($hasItemsArray) {
-            // ✅ Bán nhiều sản phẩm trong 1 lần submit (items[])
-            $request->validate([
-                'customer_type'         => 'required|in:guest,customer',
-                'paid_amount'           => 'nullable|integer|min:0',
-                'items'                 => 'required|array|min:1',
-                'items.*.product_id'    => 'required|exists:products,id',
-                'items.*.quantity'      => 'required|integer|min:1',
-                'items.*.price'         => 'required|integer|min:0',
-            ]);
-        } else {
-            // ✅ Fallback: chỉ bán 1 sản phẩm (cách cũ)
-            $request->validate([
-                'customer_type' => 'required|in:guest,customer',
-                'paid_amount'   => 'nullable|integer|min:0',
-                'product_id'    => 'required|exists:products,id',
-                'quantity'      => 'required|integer|min:1',
-                'price'         => 'required|integer|min:0',
-            ]);
-        }
 
         // Xử lý khách hàng (dùng chung cho cả 2 trường hợp)
         $customer = null;

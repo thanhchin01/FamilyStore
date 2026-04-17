@@ -1,20 +1,30 @@
 // resources/scss/_variables.scss
 
-// Colors
-$primary-color: #4f46e5;      // Indigo
-$primary-hover: #4338ca;
+// Colors - Teal Palette
+$primary-color: #009688;      // Màu chính (Teal)
+$primary-hover: #00796B;
 $secondary-color: #64748b;
-$success-color: #10b981;
-$info-color: #3b82f6;
-$warning-color: #f59e0b;
-$danger-color: #ef4444;
-$dark-bg: #0f172a;           // Màu nền Sidebar
-$light-bg: #f8fafc;          // Màu nền Web
-$footer-bg: #1e293b;
-$text-main: #334155;
-$text-light: #94a3b8;
+$success-color: #4CAF50;      // Giữ xanh lá cho thành công hoặc dùng Teal sáng
+$info-color: #00BCD4;
+$warning-color: #FFC107;
+$danger-color: #FF5252;
+
+// Backgrounds
+$dark-bg: #00695C;           // Teal đậm cho sidebar
+$light-bg: #E0F2F1;          // Nền Teal cực nhẹ
+$white-bg: #FFFFFF;
+$footer-bg: #004D40;
+
+// Text Colors
+$text-main: #004D40;
+$text-light: #B2DFDB;
+$text-muted: #666;
 
 // Dimensions & Settings
-$sidebar-width: 300px;
+$sidebar-width: 280px;
 $transition-speed: 0.3s;
-$font-main: 'Inter', sans-serif;
+$font-main: 'Outfit', 'Inter', sans-serif; // Using Outfit for a more modern feel
+$border-radius: 12px;
+$box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+$glass-bg: rgba(255, 255, 255, 0.8);
+$glass-border: rgba(255, 255, 255, 0.3);

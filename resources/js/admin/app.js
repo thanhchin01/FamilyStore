@@ -1,5 +1,6 @@
-// import './bootstrap';
-import 'bootstrap';
+import * as bootstrap from 'bootstrap';
+window.bootstrap = bootstrap;
+
 import { animate } from 'animejs';
 // import {
 //     runCounter
@@ -116,6 +117,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+// Global confirmDelete function for shared modal
+window.confirmDelete = function(actionUrl, message = null) {
+    const modalElement = document.getElementById('confirmDeleteModal');
+    if (!modalElement) return;
+    
+    const modal = new bootstrap.Modal(modalElement);
+    const form = document.getElementById('deleteModalForm');
+    const messageElement = document.getElementById('deleteModalMessage');
+    
+    if (form) form.action = actionUrl;
+    if (messageElement) {
+        messageElement.innerText = message || 'Hành động này không thể hoàn tác và dữ liệu liên quan sẽ bị mất.';
+    }
+    
+    modal.show();
+};
 
 
 

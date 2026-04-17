@@ -15,11 +15,19 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // Chạy AdminUserSeeder
+        $this->call(AdminUserSeeder::class);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        // Tài khoản Khách hàng
+        User::updateOrCreate(
+            ['email' => 'client@example.com'],
+            [
+                'name' => 'Nguyễn Khách Hàng',
+                'username' => 'khachhang',
+                'password' => \Illuminate\Support\Facades\Hash::make('12345678'),
+                'role' => 'client',
+                'status' => 'active',
+            ]
+        );
     }
 }

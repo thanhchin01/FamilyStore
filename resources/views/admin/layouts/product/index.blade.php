@@ -245,13 +245,10 @@
                                     @else
                                         <span class="badge bg-secondary">Ngừng bán</span>
                                     @endif --}}
-                                    <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST"
-                                        class="d-inline" onsubmit="return confirm('Bạn có chắc muốn xóa sản phẩm này?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="btn btn-sm btn-outline-danger"
-                                            onclick="confirmDelete({{ $product->id }})">Xóa</button>
-                                    </form>
+                                    <button type="button" class="btn btn-sm btn-outline-danger"
+                                        onclick="confirmDelete('{{ route('admin.products.destroy', $product->id) }}', 'Bạn có chắc chắn muốn xóa sản phẩm {{ $product->name }} không?')">
+                                        Xóa
+                                    </button>
                                 </td>
                             </tr>
 
