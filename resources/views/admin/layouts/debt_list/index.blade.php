@@ -19,20 +19,19 @@
         <div class="row g-4">
             <!-- Bảng danh sách khách nợ -->
             <div class="col-lg-7">
-                <div class="debt-card overflow-hidden text-nowrap">
+                <div class="debt-card overflow-hidden text-nowrap shadow-sm border-0 rounded-4 bg-white">
                     <table class="table table-hover align-middle mb-0">
                         <thead class="table-light">
                             <tr>
-                                <th class="ps-4">Khách hàng</th>
-                                <th>Thông tin liên hệ</th>
-                                <th>Tổng nợ</th>
-                                <th class="text-end pe-4">Thao tác</th>
+                                <th class="ps-4 py-3">Khách hàng</th>
+                                <th class="py-3">Thông tin liên hệ</th>
+                                <th class="py-3">Tổng nợ</th>
+                                <th class="text-end pe-4 py-3">Thao tác</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {{-- ✅ Vòng lặp hiển thị danh sách khách nợ --}}
                             @forelse($debtors as $debtor)
-                                <tr class="debtor-item cursor-pointer"
+                                <tr class="debtor-item cursor-pointer {{ ($selectedCustomer && $selectedCustomer->id == $debtor->id) ? 'bg-primary-light active' : '' }}"
                                     onclick="window.location.href='?keyword={{ request('keyword') }}&selected_id={{ $debtor->id }}'">
                                     <td class="ps-4">
                                         <div class="fw-bold text-dark">{{ $debtor->name }}</div>
@@ -53,20 +52,19 @@
                                             class="fw-bold text-danger">{{ number_format($debtor->debt->total_debt ?? 0) }}đ</span>
                                     </td>
                                     <td class="text-end pe-4">
-                                        <button class="btn btn-sm btn-light border"><i
-                                                class="fa-solid fa-eye text-primary"></i></button>
+                                        <button class="btn btn-sm btn-white border rounded-circle shadow-sm">
+                                            <i class="fa-solid fa-eye text-primary"></i>
+                                        </button>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="4" class="text-center py-5 text-muted">Không tìm thấy khách hàng nào đang có
-                                        nợ.</td>
+                                    <td colspan="4" class="text-center py-5 text-muted">Không tìm thấy khách hàng nào đang có nợ.</td>
                                 </tr>
                             @endforelse
                         </tbody>
                     </table>
 
-                    {{-- Phân trang --}}
                     <div class="p-3">
                         {{ $debtors->links() }}
                     </div>
@@ -75,66 +73,81 @@
 
             <!-- Chi tiết nợ của khách được chọn -->
             <div class="col-lg-5">
-                @php
-                    // Logic hiển thị chi tiết: Lấy khách được chọn qua ID, hoặc lấy khách đầu tiên trong danh sách
-                    $selectedId = request('selected_id');
-                    $selectedCustomer = $selectedId
-                        ? $debtors->firstWhere('id', $selectedId)
-                        : $debtors->first();
-                @endphp
-
                 @if($selectedCustomer)
-                    <div class="debt-card p-4">
+                    <div class="debt-card p-4 shadow-sm border-0 rounded-4 bg-white overflow-hidden">
                         <div class="d-flex justify-content-between align-items-start mb-4">
                             <div>
-                                <h5 class="fw-bold mb-1">Chi tiết: {{ $selectedCustomer->name }}</h5>
+                                <h5 class="fw-bold mb-1 text-dark">Chi tiết: {{ $selectedCustomer->name }}</h5>
                                 <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-3">Đang nợ</span>
                             </div>
-                            <!-- Nút này sẽ mở Modal trả nợ (cần JS xử lý sau) -->
-                            <button class="btn btn-sm btn-success rounded-pill px-3" data-bs-toggle="modal"
+                            <button class="btn btn-sm btn-success rounded-pill px-3 shadow-sm fw-bold" data-bs-toggle="modal"
                                 data-bs-target="#modalPayDebt" data-id="{{ $selectedCustomer->id }}"
                                 data-name="{{ $selectedCustomer->name }}"
                                 data-debt="{{ $selectedCustomer->debt->total_debt ?? 0 }}">
-                                Trả bớt nợ
+                                <i class="fas fa-money-bill-wave me-1"></i> Trả bớt nợ
                             </button>
                         </div>
 
                         <!-- Thông tin mở rộng -->
                         <div class="row g-3 mb-4">
                             <div class="col-6">
-                                <div class="info-label">Địa chỉ</div>
-                                <div class="small fw-medium">{{ $selectedCustomer->address ?? 'Chưa cập nhật' }}</div>
+                                <div class="info-label text-muted extra-small text-uppercase fw-bold mb-1">Địa chỉ</div>
+                                <div class="small fw-medium text-dark text-wrap">{{ $selectedCustomer->address ?? 'Chưa cập nhật' }}</div>
                             </div>
                             <div class="col-6">
-                                <div class="info-label">Người thân liên hệ</div>
-                                <div class="small fw-medium">{{ $selectedCustomer->relative_name ?? 'Không có' }}</div>
+                                <div class="info-label text-muted extra-small text-uppercase fw-bold mb-1">Người thân</div>
+                                <div class="small fw-medium text-dark">{{ $selectedCustomer->relative_name ?? 'Không có' }}</div>
                             </div>
                         </div>
 
-                        <hr class="text-light-subtle">
+                        <hr class="text-light-subtle my-4">
 
-                        <!-- Lịch sử giao dịch -->
-                        {{-- Lưu ý: Phần lịch sử này hiện tại chưa có dữ liệu từ Controller,
-                        Cần dùng AJAX hoặc load thêm relation 'transactions' để hiển thị thật --}}
-                        <h6 class="fw-bold mb-3">Lịch sử giao dịch</h6>
-                        <div class="history-timeline">
-                            {{-- Placeholder mẫu để giữ layout --}}
-                            <!-- Mua hàng (Ghi nợ) -->
-                            <div class="timeline-event plus">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div>
-                                        <div class="fw-bold small">Dữ liệu mẫu (Đang cập nhật...)</div>
-                                        <div class="text-muted" style="font-size: 0.75rem;">---</div>
+                        <!-- Lịch sử giao dịch thật -->
+                        <h6 class="fw-bold mb-3 d-flex align-items-center text-primary">
+                            <i class="fas fa-history me-2"></i> Lịch sử giao dịch
+                        </h6>
+                        <div class="history-timeline overflow-auto pe-2" style="max-height: 420px;">
+                            @forelse($history as $item)
+                                @php 
+                                    $isPayment = ($item->type ?? '') === 'payment';
+                                    $isPurchase = ($item->type ?? '') === 'purchase';
+                                @endphp
+                                <div class="timeline-event mb-3 pb-3 border-bottom {{ $isPayment ? 'payment' : 'purchase' }}">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div class="d-flex">
+                                            <div class="event-icon me-3 mt-1 {{ $isPayment ? 'text-success' : 'text-danger' }}">
+                                                <i class="fas {{ $isPayment ? 'fa-circle-check' : 'fa-square-plus' }}"></i>
+                                            </div>
+                                            <div class="pe-3">
+                                                <div class="fw-bold small text-dark">
+                                                    @if($isPayment)
+                                                        Khách trả bớt nợ
+                                                    @elseif($isPurchase)
+                                                        Mua hàng: {{ $item->invoice_code ?? '#INV' }}
+                                                    @else
+                                                        Ghi nợ phát sinh
+                                                    @endif
+                                                </div>
+                                                <div class="text-muted text-wrap" style="font-size: 0.75rem;">{{ $item->description }}</div>
+                                                <div class="extra-small text-muted fst-italic">{{ \Carbon\Carbon::parse($item->occurred_at)->format('d/m/Y H:i') }}</div>
+                                            </div>
+                                        </div>
+                                        <div class="fw-bold {{ $isPayment ? 'text-success' : 'text-danger' }}">
+                                            {{ $isPayment ? '-' : '+' }}{{ number_format($item->amount) }}đ
+                                        </div>
                                     </div>
-                                    <div class="text-danger fw-bold">---</div>
                                 </div>
-                            </div>
+                            @empty
+                                <div class="text-center py-5 text-muted">
+                                    <i class="fas fa-calendar-alt fa-2x mb-2 opacity-25"></i>
+                                    <p class="small mb-0">Chưa có lịch sử giao dịch.</p>
+                                </div>
+                            @endforelse
                         </div>
 
-                        <div class="bg-light p-3 rounded-3 d-flex justify-content-between align-items-center mt-3">
-                            <span class="fw-bold small text-uppercase">Số dư nợ hiện tại:</span>
-                            <span
-                                class="fs-5 fw-bold text-danger">{{ number_format($selectedCustomer->debt->total_debt ?? 0) }}đ</span>
+                        <div class="bg-light p-3 rounded-4 d-flex justify-content-between align-items-center mt-3 border border-dashed">
+                            <span class="fw-bold small text-uppercase text-muted">Số dư nợ hiện tại:</span>
+                            <span class="fs-4 fw-bold text-danger">{{ number_format($selectedCustomer->debt->total_debt ?? 0) }}đ</span>
                         </div>
                     </div>
                 @else
@@ -146,4 +159,13 @@
             </div>
         </div>
     </div>
+
+    @include('admin.components.debt-pay-modal')
 @endsection
+
+<style>
+.bg-primary-light { background-color: #f0f9ff !important; }
+.debtor-item.active { border-left: 4px solid #0ea5e9; }
+.extra-small { font-size: 0.7rem; }
+.btn-white { background: white; }
+</style>

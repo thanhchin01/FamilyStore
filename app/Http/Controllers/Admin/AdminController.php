@@ -9,26 +9,50 @@ use App\Models\Customers;
 use App\Models\Products;
 use App\Models\Sales;
 use App\Models\Imports;
-use App\Services\DebtService;
+use App\Services\Admin\DebtService;
 use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {
     public function index()
     {
-        // Trang Dashboard chính
-        return view('admin.layouts.dashboard.index');
+        // 1. Tính toán các con số thống kê thực tế
+        $totalProducts = \App\Models\Products::count();
+        $totalSalesCount = \App\Models\Sales::count();
+        $totalRevenue = \App\Models\Sales::sum(\DB::raw('price * quantity'));
+        $totalCustomerDebt = \App\Models\Customer_Debts::sum('total_debt');
+        
+        // 2. Lấy 5 đơn hàng mới nhất (Sales)
+        $recentSales = \App\Models\Sales::with(['product', 'customer'])
+            ->latest()
+            ->limit(5)
+            ->get();
+
+        // 3. Lấy 5 khách hàng nợ nhiều nhất
+        $topDebtors = \App\Models\Customers::join('customer__debts', 'customers.id', '=', 'customer__debts.customer_id')
+            ->where('customer__debts.total_debt', '>', 0)
+            ->orderByDesc('customer__debts.total_debt')
+            ->select('customers.*', 'customer__debts.total_debt')
+            ->limit(5)
+            ->get();
+
+        return view('admin.layouts.dashboard.index', compact(
+            'totalProducts', 
+            'totalSalesCount', 
+            'totalRevenue', 
+            'totalCustomerDebt',
+            'recentSales',
+            'topDebtors'
+        ));
     }
 
     public function inventory()
     {
-        // Trang quản lý kho (Inventory)
-        // Lấy danh mục để hiển thị filter hoặc dropdown
-        // Lấy danh sách sản phẩm kèm theo danh mục (eager loading 'category') để tránh N+1 query
-        return view('admin.layouts.inventory.index', [
-            'categories' => Categories::orderBy('name')->get(),
-            'products' => Products::with('category')->orderBy('id', 'desc')->get()
-        ]);
+        // Lấy tất cả sản phẩm kèm danh mục để hiển thị trong kho
+        $products = Products::with('category')->orderBy('name')->get();
+        $categories = Categories::orderBy('name')->get();
+
+        return view('admin.layouts.inventory.index', compact('products', 'categories'));
     }
 
     public function sale()
@@ -119,15 +143,12 @@ class AdminController extends Controller
 
     public function history()
     {
-        // return view('admin.layouts.history.index');
-        // Trang Lịch sử bán hàng chi tiết
         return view('admin.layouts.history.index', [
             'categories' => Categories::orderBy('name')->get(),
             'products' => Products::all(),
             'sales' => Sales::with(['product', 'customer', 'customer.debt'])
                 ->latest()
-                ->limit(200)
-                ->get(),
+                ->paginate(15),
         ]);
     }
 
@@ -153,27 +174,73 @@ class AdminController extends Controller
             });
         }
 
-        // 4. Eager load quan hệ 'debt' để lấy số tiền hiển thị
-        // Sắp xếp mặc định: Người nợ nhiều nhất lên đầu
+        // 4. Eager load quan hệ 'debt'
         $debtors = $query->with('debt')
             ->orderByDesc('customer__debts.total_debt')
-            ->paginate(10)
-            ->appends($request->query()); // Giữ tham số search khi phân trang
+            ->paginate(15)
+            ->appends($request->query());
 
-        return view('admin.layouts.debt_list.index', compact('debtors'));
+        // 5. Lấy chi tiết giao dịch cho khách hàng đang được chọn
+        $selectedId = $request->selected_id;
+        $selectedCustomer = null;
+        $history = collect();
+
+        if ($selectedId || $debtors->count() > 0) {
+            $selectedCustomer = $selectedId 
+                ? Customers::with('debt')->find($selectedId) 
+                : $debtors->first();
+
+            if ($selectedCustomer) {
+                // 1. Lấy các lần TRẢ NỢ (payment) và GHI NỢ LẺ (không qua hóa đơn - nếu có)
+                $transactions = \App\Models\Debt_Transactions::where('customer_id', $selectedCustomer->id)
+                    ->where(function($q) {
+                        $q->where('type', 'payment')
+                          ->orWhereNull('sale_id'); // Những lần ghi nợ bằng tay không qua bán hàng
+                    })
+                    ->orderByDesc('created_at')
+                    ->get();
+
+                $transactionHistory = $transactions->map(function($t) {
+                    return (object)[
+                        'type' => $t->type, 
+                        'amount' => $t->amount,
+                        'description' => $t->description,
+                        'occurred_at' => $t->created_at,
+                        'invoice_code' => null
+                    ];
+                });
+
+                // 2. Lấy các lần MUA HÀNG từ bảng sales
+                $salesHistory = \App\Models\Sales::with('product')
+                    ->where('customer_id', $selectedCustomer->id)
+                    ->orderByDesc('sold_at')
+                    ->get();
+
+                // Gộp chung và sắp xếp
+                $history = $transactionHistory->concat($salesHistory->map(function($sale) {
+                    return (object)[
+                        'type' => 'purchase',
+                        'amount' => $sale->price * $sale->quantity,
+                        'description' => $sale->product->name . ' (SL: ' . $sale->quantity . ')',
+                        'occurred_at' => $sale->sold_at,
+                        'invoice_code' => $sale->invoice_code
+                    ];
+                }))->sortByDesc('occurred_at');
+            }
+        }
+
+        return view('admin.layouts.debt_list.index', compact('debtors', 'selectedCustomer', 'history'));
     }
 
     public function stock()
     {
-        // ✅ Added: đổ dữ liệu sản phẩm + lịch sử nhập kho
-        // Trang Lịch sử nhập kho
+        // Trang Nhập kho
         return view('admin.layouts.stock_entry.index', [
             'categories' => Categories::orderBy('name')->get(),
             'products' => Products::with('category')->orderBy('name')->get(),
             'imports' => Imports::with('product')
-                ->orderByDesc('id')
-                ->limit(20)
-                ->get(),
+                ->latest()
+                ->paginate(15),
         ]);
     }
 
@@ -205,7 +272,7 @@ class AdminController extends Controller
         // orderByDesc('id'): Sản phẩm mới nhất lên đầu
         $products = $query
             ->orderByDesc('id')
-            ->paginate(10)
+            ->paginate(15)
             ->appends($request->query());
 
         return view('admin.layouts.product.index', compact('products', 'categories'));
@@ -213,6 +280,72 @@ class AdminController extends Controller
 
     public function statistics()
     {
-        return view('admin.layouts.statistics.index');
+        // 1. Dữ liệu doanh thu 7 ngày gần nhất cho biểu đồ
+        $revenueData = [];
+        $labels = [];
+        for ($i = 6; $i >= 0; $i--) {
+            $date = now()->subDays($i);
+            $labels[] = $date->format('d/m');
+            $dailySum = \App\Models\Sales::whereDate('created_at', $date->toDateString())
+                ->sum(\DB::raw('price * quantity'));
+            $revenueData[] = $dailySum;
+        }
+
+        // 2. Tỷ trọng ngành hàng (Top 5 danh mục)
+        $categoriesStats = Categories::withCount('products')
+            ->orderByDesc('products_count')
+            ->limit(5)
+            ->get();
+
+        // 3. Các chỉ số tổng hợp
+        $stats = [
+            'today_revenue' => \App\Models\Sales::whereDate('created_at', now()->toDateString())->sum(\DB::raw('price * quantity')),
+            'new_orders_month' => \App\Models\Sales::whereMonth('created_at', now()->month)->count(),
+            'total_customers' => \App\Models\Customers::count(),
+            'new_debt_month' => \App\Models\Sales::whereMonth('created_at', now()->month)->sum(\DB::raw('price * quantity - IFNULL(paid_amount, 0)')),
+        ];
+
+        return view('admin.layouts.statistics.index', compact('labels', 'revenueData', 'categoriesStats', 'stats'));
+    }
+
+    /**
+     * Lấy số lượng thông báo mới (Đơn hàng & Tin nhắn)
+     */
+    public function getNotificationCounts(Request $request)
+    {
+        $orderCount = \App\Models\Order::where('status', 'pending')->count();
+        
+        $messageCount = \App\Models\Message::where('is_read', false)
+            ->whereHas('sender', function($q) {
+                $q->where('role', '!=', 'admin');
+            })->count();
+
+        $data = [
+            'success' => true,
+            'orders' => $orderCount,
+            'messages' => $messageCount
+        ];
+
+        // Nếu yêu cầu lấy danh sách khách nợ (Dùng cho trang POS)
+        if ($request->get('type') === 'debtors') {
+            $data['debtors'] = Customers::join('customer__debts', 'customers.id', '=', 'customer__debts.customer_id')
+                ->where('customer__debts.total_debt', '>', 0)
+                ->select('customers.*', 'customer__debts.total_debt')
+                ->get();
+        }
+
+        return response()->json($data);
+    }
+
+    /**
+     * Trang Quản lý Đơn hàng (Orders)
+     */
+    public function orders()
+    {
+        $orders = \App\Models\Order::with(['customer', 'items'])
+            ->orderByDesc('id')
+            ->paginate(15);
+
+        return view('admin.layouts.order.index', compact('orders'));
     }
 }

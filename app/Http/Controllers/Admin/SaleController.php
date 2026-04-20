@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Customers;
 use App\Models\Products;
 use App\Models\Sales;
-use App\Services\SaleService;
+use App\Services\Admin\SaleService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 

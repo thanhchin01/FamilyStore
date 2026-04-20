@@ -8,11 +8,30 @@
             {{-- <img class="navbar-logo" src="{{ asset('images/admin/logo-1.png') }}" alt="KQ Store"> --}}
         </a>
 
-        <!-- Sidebar Toggle Button -->
-        <button class="btn-sidebar-toggle ms-auto order-lg-last" type="button" data-bs-toggle="offcanvas"
-            data-bs-target="#sidebarRight" aria-controls="sidebarRight">
-            <i class="fa-solid fa-bars-staggered"></i>
-        </button>
+        <!-- Notification Badges -->
+        <div class="d-flex align-items-center ms-auto order-lg-last gap-2">
+            <!-- Order Notification -->
+            <a href="{{ route('admin.orders.index') }}" class="nav-link position-relative p-2" title="Đơn hàng mới">
+                <i class="fa-solid fa-cart-shopping fs-5"></i>
+                <span id="orderBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none" style="font-size: 0.6rem;">
+                    0
+                </span>
+            </a>
+
+            <!-- Message Notification -->
+            <a href="{{ route('admin.chat.index') }}" class="nav-link position-relative p-2" title="Tin nhắn mới">
+                <i class="fa-solid fa-envelope fs-5"></i>
+                <span id="messageBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary-light d-none" style="font-size: 0.6rem; background-color: #009688 !important;">
+                    0
+                </span>
+            </a>
+
+            <!-- Sidebar Toggle Button -->
+            <button class="btn-sidebar-toggle ms-2" type="button" data-bs-toggle="offcanvas"
+                data-bs-target="#sidebarRight" aria-controls="sidebarRight">
+                <i class="fa-solid fa-bars-staggered"></i>
+            </button>
+        </div>
 
         <!-- Desktop Menu -->
         <div class="collapse navbar-collapse me-4" id="navbarNav">

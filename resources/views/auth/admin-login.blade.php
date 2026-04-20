@@ -33,18 +33,12 @@
                             <label for="username" class="form-label fw-600">Tên đăng nhập</label>
                             <input type="text" id="username" name="username" value="{{ old('username') }}"
                                 class="form-control @error('username') is-invalid @enderror" required autofocus>
-                            @error('username')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
                         </div>
 
                         <div class="mb-3">
                             <label for="password" class="form-label fw-600">Mật khẩu</label>
                             <input type="password" id="password" name="password"
                                 class="form-control @error('password') is-invalid @enderror" required>
-                            @error('password')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
                         </div>
 
                         <div class="mb-3 form-check">
@@ -59,6 +53,23 @@
                         </div>
                     </form>
                 </div>
+                
+                {{-- Premium Toasts --}}
+                @include('client.partials.toasts')
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const hideToast = (toast) => {
+                            setTimeout(() => {
+                                toast.style.opacity = '0';
+                                toast.style.transform = 'translateX(100px)';
+                                toast.style.transition = 'all 0.5s ease';
+                                setTimeout(() => toast.remove(), 500);
+                            }, 5000);
+                        };
+                        document.querySelectorAll('.premium-toast').forEach(hideToast);
+                    });
+                </script>
                 <div class="text-center mt-4">
                     <a href="{{ route('client.home') }}" class="text-muted text-decoration-none small">
                         <i class="fas fa-arrow-left me-1"></i> Quay lại cửa hàng

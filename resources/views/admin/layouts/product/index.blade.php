@@ -7,140 +7,22 @@
         <!-- Header -->
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
-                <h4 class="fw-bold mb-1">Danh sách sản phẩm</h4>
+                <h4 class="fw-bold mb-1 font-luxury text-primary">Danh sách sản phẩm</h4>
                 <p class="text-muted small mb-0">Quản lý thông tin – giá bán – bảo hành</p>
             </div>
-            <button class="btn btn-primary rounded-3 px-4 shadow-sm" data-bs-toggle="modal"
+            <button class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold" data-bs-toggle="modal"
                 data-bs-target="#createProductModal">
-                <i class="fa-solid fa-plus me-2"></i>Thêm sản phẩm
+                <i class="fa-solid fa-plus me-2"></i>Thêm sản phẩm mới
             </button>
-        </div>
-        {{-- MODAL THÊM SẢN PHẨM --}}
-        <div class="modal fade" id="createProductModal" tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered modal-lg"> <!-- modal-lg để form rộng rãi hơn -->
-                <div class="modal-content">
-                    <form method="POST" action="{{ route('admin.products.store') }}">
-                        @csrf
-                        <div class="modal-header">
-                            <h5 class="modal-title fw-bold">Thêm sản phẩm mới</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-
-                        <div class="modal-body">
-                            <div class="row g-3">
-                                <!-- Thông tin chung -->
-                                <div class="col-12">
-                                    <label class="form-label fw-semibold text-muted small text-uppercase">Thông tin cơ
-                                        bản</label>
-                                </div>
-
-                                <div class="col-12">
-                                    <label class="form-label fw-bold">Tên sản phẩm <span
-                                            class="text-danger">*</span></label>
-                                    <input type="text" name="name" class="form-control"
-                                        placeholder="Ví dụ: Nồi cơm điện Sharp 1.8L" required>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold">Danh mục <span
-                                            class="text-danger">*</span></label>
-                                    {{-- <select name="category" class="form-select" required>
-                                        <option value="" selected disabled>-- Chọn danh mục --</option>
-                                        <option value="Nồi cơm điện">Nồi cơm điện</option>
-                                        <option value="Ấm siêu tốc">Ấm siêu tốc</option>
-                                        <option value="Vợt muỗi">Vợt muỗi</option>
-                                        <option value="Quạt điện">Quạt điện</option>
-                                        <option value="Điều khiển">Điều khiển</option>
-                                        <option value="Khác">Khác</option>
-                                    </select> --}}
-                                    <select name="category_id" class="form-select" required>
-                                        <option value="">-- Chọn danh mục --</option>
-                                        @foreach ($categories as $category)
-                                            <option value="{{ $category->id }}">{{ $category->name }}</option>
-                                        @endforeach
-                                    </select>
-
-                                    {{-- <input type="text" name="category_id" class="form-control" required> --}}
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold">Hãng sản xuất <span
-                                            class="text-danger">*</span></label>
-                                    {{-- <select name="brand" class="form-select" required>
-                                        <option value="" selected disabled>-- Chọn hãng --</option>
-                                        <option value="Sharp">Sharp</option>
-                                        <option value="Sunhouse">Sunhouse</option>
-                                        <option value="Comet">Comet</option>
-                                        <option value="Philips">Philips</option>
-                                        <option value="Panasonic">Panasonic</option>
-                                        <option value="Khác">Khác</option>
-                                    </select> --}}
-                                    <input type="text" name="brand" class="form-control" required>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold">Model / Mã SP</label>
-                                    <input type="text" name="model" class="form-control" placeholder="Ví dụ: KS-IH191">
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold">Bảo hành (Tháng)</label>
-                                    <div class="input-group">
-                                        <input type="number" name="warranty_months" class="form-control" value="12"
-                                            min="0">
-                                        <span class="input-group-text bg-light text-muted">Tháng</span>
-                                    </div>
-                                </div>
-
-                                <!-- Giá và Kho -->
-                                <div class="col-12 mt-4">
-                                    <label class="form-label fw-semibold text-muted small text-uppercase">Thiết lập bán
-                                        hàng</label>
-                                    <hr class="mt-1 mb-3 text-muted">
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">Giá bán (VNĐ) <span
-                                            class="text-danger">*</span></label>
-                                    <div class="input-group">
-                                        <input type="number" name="price" class="form-control fw-bold text-primary"
-                                            placeholder="0" min="0" required>
-                                        <span class="input-group-text fw-bold">đ</span>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">Số lượng tồn đầu kỳ <span
-                                            class="text-danger">*</span></label>
-                                    <input type="number" name="stock" class="form-control" value="1" min="1"
-                                        required>
-                                </div>
-
-                                <div class="col-12">
-                                    <label class="form-label fw-semibold">Mô tả / Ghi chú</label>
-                                    <textarea name="description" class="form-control" rows="3" placeholder="Nhập mô tả chi tiết sản phẩm..."></textarea>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="modal-footer bg-light">
-                            <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Hủy bỏ</button>
-                            <button type="submit" class="btn btn-primary px-4 fw-bold">
-                                <i class="fa-solid fa-floppy-disk me-2"></i>Lưu sản phẩm
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
         </div>
 
         <!-- Bộ lọc -->
-        <div class="card filter-card mb-4 p-3">
+        <div class="card shadow-sm border-0 rounded-4 mb-4 p-4 bg-white">
             <form method="GET" action="{{ route('admin.products') }}">
                 <div class="row g-3 align-items-end">
                     <div class="col-md-3">
-                        <label class="form-label small fw-semibold text-muted">Loại sản phẩm</label>
-                        <select name="category_id" class="form-select border-light">
+                        <label class="form-label-custom fw-bold small text-uppercase">Loại sản phẩm</label>
+                        <select name="category_id" class="form-select border-light shadow-sm">
                             <option value="">Tất cả danh mục</option>
                             @foreach ($categories as $category)
                                 <option value="{{ $category->id }}"
@@ -151,18 +33,17 @@
                         </select>
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label small fw-semibold text-muted">Hãng sản xuất</label>
-                        <select name="brand" class="form-select border-light">
+                        <label class="form-label-custom fw-bold small text-uppercase">Hãng sản xuất</label>
+                        <select name="brand" class="form-select border-light shadow-sm">
                             <option value="">Tất cả hãng</option>
-                            <option value="Sharp" {{ request('brand') == 'Sharp' ? 'selected' : '' }}>Sharp</option>
-                            <option value="Sunhouse" {{ request('brand') == 'Sunhouse' ? 'selected' : '' }}>Sunhouse
-                            </option>
-                            <option value="Comet" {{ request('brand') == 'Comet' ? 'selected' : '' }}>Comet</option>
+                            @foreach($products->pluck('brand')->unique() as $brand)
+                                <option value="{{ $brand }}" {{ request('brand') == $brand ? 'selected' : '' }}>{{ $brand }}</option>
+                            @endforeach
                         </select>
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label small fw-semibold text-muted">Tìm kiếm nhanh</label>
-                        <div class="input-group">
+                        <label class="form-label-custom fw-bold small text-uppercase">Tìm kiếm nhanh</label>
+                        <div class="input-group shadow-sm">
                             <span class="input-group-text bg-white border-end-0 border-light text-muted">
                                 <i class="fa-solid fa-magnifying-glass"></i>
                             </span>
@@ -171,7 +52,7 @@
                         </div>
                     </div>
                     <div class="col-md-2">
-                        <button type="submit" class="btn btn-outline-primary w-100 border-2 fw-bold">
+                        <button type="submit" class="btn btn-primary w-100 rounded-pill fw-bold shadow-sm">
                             Lọc dữ liệu
                         </button>
                     </div>
@@ -180,214 +61,87 @@
         </div>
 
         <!-- Table -->
-        <div class="product-card">
+        <div class="card shadow-sm border-0 rounded-4 bg-white overflow-hidden">
             <div class="table-responsive">
-                <table class="table align-middle mb-0">
+                <table class="table align-middle mb-0 table-hover">
                     <thead class="table-light">
-                        <tr>
-                            <th class="ps-4">Sản phẩm</th>
-                            <th>Danh mục</th>
-                            <th>Giá bán lẻ</th>
-                            <th>Bảo hành</th>
-                            <th>Trạng thái kho</th>
-                            <th class="text-end pe-4">Thao tác</th>
+                        <tr class="small text-uppercase fw-bold text-muted">
+                            <th class="ps-4 py-3">Sản phẩm</th>
+                            <th class="py-3">Danh mục</th>
+                            <th class="py-3">Giá bán lẻ</th>
+                            <th class="py-3">Bảo hành</th>
+                            <th class="py-3">Kho hàng</th>
+                            <th class="text-end pe-4 py-3">Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($products as $product)
-                            <!-- Item 1: Nồi cơm -->
                             <tr>
                                 <td class="ps-4">
                                     <div class="d-flex align-items-center">
-                                        <div class="product-thumb me-3">
-                                            <i class="fa-solid fa-bowl-rice"></i>
+                                        <div class="product-thumb me-3 bg-light rounded-3 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; color: #0ea5e9;">
+                                            <i class="fa-solid fa-box-open fs-5"></i>
                                         </div>
                                         <div>
                                             <div class="fw-bold text-dark">{{ $product->name }}</div>
-                                            <div class="text-muted small"> Hãng: {{ $product->brand }}
-                                                @if ($product->model)
-                                                    | Model: {{ $product->model }}
-                                                @endif
+                                            <div class="text-muted extra-small"> Hãng: {{ $product->brand }}
+                                                @if ($product->model) | Model: {{ $product->model }} @endif
                                             </div>
                                         </div>
                                     </div>
                                 </td>
-                                <td><span class="text-secondary">{{ $product->category?->name ?? '—' }}</span></td>
+                                <td><span class="text-secondary small fw-medium">{{ $product->category?->name ?? '—' }}</span></td>
                                 <td><span class="fw-bold text-primary">{{ number_format($product->price) }}đ</span></td>
-                                <td>{{ $product->warranty_months }} tháng</td>
+                                <td><span class="small">{{ $product->warranty_months }} tháng</span></td>
                                 <td>
                                     @if ($product->stock > 5)
-                                        <span class="badge bg-success-subtle text-success fw-semibold">
+                                        <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3">
                                             {{ $product->stock }} cái
                                         </span>
                                     @elseif($product->stock > 0)
-                                        <span class="badge bg-warning-subtle text-warning fw-semibold">
+                                        <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3">
                                             {{ $product->stock }} cái
                                         </span>
                                     @else
-                                        <span class="badge bg-danger-subtle text-danger fw-semibold">
+                                        <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-3">
                                             Hết hàng
                                         </span>
                                     @endif
                                 </td>
                                 <td class="text-end pe-4 text-nowrap">
-                                    <button class="btn btn-sm btn-outline-primary me-1 px-3" data-bs-toggle="modal"
-                                        data-bs-target="#editProductModal"
-                                        onclick="fillEditProduct(1, 'Coca', 10000, 20)">Sửa</button>
-                                    {{-- @if ($product->is_active)
-                                        <form action="{{ route('admin.products.disable', $product->id) }}" method="POST"
-                                            class="d-inline">
-                                            @csrf
-                                            <button class="btn btn-sm btn-light border text-muted">
-                                                Ngừng bán
-                                            </button>
-                                        </form>
-                                    @else
-                                        <span class="badge bg-secondary">Ngừng bán</span>
-                                    @endif --}}
-                                    <button type="button" class="btn btn-sm btn-outline-danger"
+                                    <button class="btn btn-sm btn-outline-primary shadow-sm rounded-pill px-3 me-1" 
+                                        onclick="openEditProductModal({{ json_encode($product) }})">
+                                        <i class="fas fa-edit me-1"></i> Sửa
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger shadow-sm rounded-pill px-3"
                                         onclick="confirmDelete('{{ route('admin.products.destroy', $product->id) }}', 'Bạn có chắc chắn muốn xóa sản phẩm {{ $product->name }} không?')">
-                                        Xóa
+                                        <i class="fas fa-trash me-1"></i> Xóa
                                     </button>
                                 </td>
                             </tr>
-
-                            {{-- MODAL THÊM SẢN PHẨM --}}
-                            <div class="modal fade" id="editProductModal" tabindex="-1">
-                                <div class="modal-dialog modal-dialog-centered modal-lg">
-                                    <!-- modal-lg để form rộng rãi hơn -->
-                                    <div class="modal-content">
-                                        <form method="POST"
-                                            action="{{ route('admin.products.update', $product->slug) }}">
-                                            @csrf
-                                            @method('PUT')
-
-                                            <div class="modal-header">
-                                                <h5 class="modal-title fw-bold">Chỉnh sửa sản phẩm</h5>
-                                                <button type="button" class="btn-close"
-                                                    data-bs-dismiss="modal"></button>
-                                            </div>
-
-                                            <div class="modal-body">
-                                                <div class="row g-3">
-                                                    <!-- Thông tin chung -->
-                                                    <div class="col-12">
-                                                        <label
-                                                            class="form-label fw-semibold text-muted small text-uppercase">Thông
-                                                            tin cơ
-                                                            bản</label>
-                                                    </div>
-
-                                                    <div class="col-12">
-                                                        <label class="form-label fw-bold">Tên sản phẩm <span
-                                                                class="text-danger">*</span></label>
-                                                        <input type="text" name="name" class="form-control"
-                                                            value="{{ old('name', $product->name ?? '') }}" required>
-                                                    </div>
-
-                                                    <div class="col-md-6">
-                                                        <label class="form-label fw-semibold">Danh mục <span
-                                                                class="text-danger">*</span></label>
-                                                        <select name="category_id" class="form-select" required>
-                                                            <option value="">-- Chọn danh mục --</option>
-                                                            {{-- @foreach ($categories as $category)
-                                                                <option value="{{ $category->id }}">{{ $category->name }}
-                                                                </option>
-                                                            @endforeach --}}
-                                                            @foreach ($categories as $category)
-                                                                <option value="{{ $category->id }}"
-                                                                    {{ old('category_id', $product->category_id ?? '') == $category->id ? 'selected' : '' }}>
-                                                                    {{ $category->name }}
-                                                                </option>
-                                                            @endforeach
-                                                        </select>
-                                                    </div>
-
-                                                    <div class="col-md-6">
-                                                        <label class="form-label fw-semibold">Hãng sản xuất <span
-                                                                class="text-danger">*</span></label>
-                                                        <input type="text" name="brand" class="form-control"
-                                                            value="{{ old('brand', $product->brand ?? '') }}" required>
-                                                    </div>
-
-                                                    <div class="col-md-6">
-                                                        <label class="form-label fw-semibold">Model / Mã SP</label>
-                                                        <input type="text" name="model" class="form-control"
-                                                            value="{{ old('model', $product->model ?? '') }}">
-                                                    </div>
-
-                                                    <div class="col-md-6">
-                                                        <label class="form-label fw-semibold">Bảo hành (Tháng)</label>
-                                                        <div class="input-group">
-                                                            <input type="number" name="warranty_months"
-                                                                class="form-control"
-                                                                value="{{ old('warranty_months', $product->warranty_months ?? 0) }}"
-                                                                min="0">
-                                                            <span class="input-group-text bg-light text-muted">Tháng</span>
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Giá và Kho -->
-                                                    <div class="col-12 mt-4">
-                                                        <label
-                                                            class="form-label fw-semibold text-muted small text-uppercase">Thiết
-                                                            lập bán
-                                                            hàng</label>
-                                                        <hr class="mt-1 mb-3 text-muted">
-                                                    </div>
-
-                                                    <div class="col-md-6">
-                                                        <label class="form-label fw-bold">Giá bán (VNĐ) <span
-                                                                class="text-danger">*</span></label>
-                                                        <div class="input-group">
-                                                            <input type="number" name="price"
-                                                                class="form-control fw-bold text-primary"
-                                                                value="{{ old('price', $product->price ?? 0) }}"
-                                                                min="0" required>
-                                                            <span class="input-group-text fw-bold">đ</span>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="col-md-6">
-                                                        <label class="form-label fw-bold">Số lượng tồn đầu kỳ <span
-                                                                class="text-danger">*</span></label>
-                                                        <input type="number" name="stock" class="form-control"
-                                                            value="{{ old('stock', $product->stock ?? 0) }}"
-                                                            min="0" required>
-                                                    </div>
-
-                                                    <div class="col-12">
-                                                        <label class="form-label fw-semibold">Mô tả / Ghi chú</label>
-                                                        <textarea name="description" class="form-control" rows="3">{{ old('description', $product->description ?? '') }}</textarea>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="modal-footer bg-light">
-                                                <button type="button" class="btn btn-light border"
-                                                    data-bs-dismiss="modal">Hủy bỏ</button>
-                                                <button type="submit" class="btn btn-primary px-4 fw-bold">
-                                                    <i class="fa-solid fa-floppy-disk me-2"></i>Lưu sản phẩm
-                                                </button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
                         @endforeach
                     </tbody>
                 </table>
             </div>
 
-            <!-- Pagination (Phân trang giả lập) -->
-            <div class="p-4 border-top d-flex justify-content-between align-items-center">
+            <!-- Pagination -->
+            <div class="p-4 border-top d-flex justify-content-between align-items-center bg-light bg-opacity-50">
                 <span class="text-muted small">
-                    Hiển thị {{ $products->firstItem() }} - {{ $products->lastItem() }}
-                    trên tổng {{ $products->total() }} sản phẩm
+                    Hiển thị <strong>{{ $products->firstItem() }} - {{ $products->lastItem() }}</strong>
+                    trên tổng <strong>{{ $products->total() }}</strong> sản phẩm
                 </span>
 
                 {{ $products->links('pagination::bootstrap-5') }}
             </div>
         </div>
     </div>
+
+    @include('admin.components.product-modals')
 @endsection
+
+<style>
+.product-thumb { transition: all 0.2s; }
+tr:hover .product-thumb { transform: scale(1.1); background-color: #0ea5e9 !important; color: white !important; }
+.extra-small { font-size: 0.72rem; }
+.form-label-custom { font-size: 0.75rem; color: #64748b; margin-bottom: 0.5rem; display: block; }
+</style>

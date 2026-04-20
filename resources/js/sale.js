@@ -50,8 +50,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const selectedId = productSelect.value;
         const product = window.saleProducts.find(p => String(p.id) === String(selectedId));
         if (product) {
-            priceInput.value = product.price;
-            systemPriceText.textContent = formatCurrency(product.price);
+            priceInput.value = window.formatCurrency(product.price);
+            systemPriceText.textContent = window.formatCurrency(product.price);
         } else {
             priceInput.value = '';
             systemPriceText.textContent = '0đ';
@@ -66,12 +66,12 @@ document.addEventListener('DOMContentLoaded', function() {
             paidAmountInput.value = total;
         }
 
-        const paid = Number(paidAmountInput.value) || 0;
+        const paid = Number(window.unformatCurrency(paidAmountInput.value)) || 0;
         const debt = Math.max(total - paid, 0);
 
         subTotalText.textContent = formatCurrency(total);
         totalText.textContent = formatCurrency(total);
-        debtAmountInput.value = debt;
+        debtAmountInput.value = window.formatCurrency(debt);
 
         if (afterDebtAmount) {
             afterDebtAmount.textContent = (currentCustomerDebt + debt).toLocaleString('vi-VN');
@@ -104,8 +104,8 @@ document.addEventListener('DOMContentLoaded', function() {
                            min="1" value="${item.quantity}" data-index="${index}">
                 </td>
                 <td>
-                    <input type="number" class="form-control form-control-sm item-price-input" 
-                           min="0" value="${item.price}" data-index="${index}">
+                    <input type="text" class="form-control form-control-sm item-price-input money-input" 
+                           value="${window.formatCurrency(item.price)}" data-index="${index}">
                 </td>
                 <td class="fw-semibold text-primary">${formatCurrency(lineTotal)}</td>
                 <td class="text-end">
@@ -224,11 +224,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // XỬ LÝ NÚT [THÊM SẢN PHẨM VÀO HÓA ĐƠN]
     if (btnAddSaleItem) {
         btnAddSaleItem.addEventListener('click', function() {
-            console.log("Btn Add Item Clicked!"); // Debug log
-            
             const productId = productSelect.value;
             const quantity = Number(quantityInput.value);
-            const price = Number(priceInput.value);
+            const price = Number(window.unformatCurrency(priceInput.value));
 
             if (!productId) {
                 alert('Vui lòng chọn 1 sản phẩm trước khi thêm!');
@@ -289,9 +287,8 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (e.target.classList.contains('item-price-input')) {
                 const index = e.target.getAttribute('data-index');
-                saleItems[index].price = Math.max(Number(e.target.value) || 0, 0);
-                renderSaleItems();
-                syncSaleHiddenInputs();
+                saleItems[index].price = Math.max(Number(window.unformatCurrency(e.target.value)) || 0, 0);
+                // Note: renderSaleItems() will be called, which will format the value back
                 updateTotals();
             }
         });

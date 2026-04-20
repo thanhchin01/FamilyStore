@@ -28,7 +28,13 @@
                                     <td class="py-4">
                                         <div class="d-flex align-items-center">
                                             <div class="p-2 border border-light-subtle rounded-3 me-3" style="width: 80px; height: 80px;">
-                                                <img src="{{ $item['image'] }}" class="img-fluid rounded-2" alt="{{ $item['name'] }}">
+                                                @if($item['image'])
+                                                    <img src="{{ Str::startsWith($item['image'], 'http') ? $item['image'] : asset('storage/' . $item['image']) }}" class="img-fluid rounded-2 h-100 w-100 object-fit-contain" alt="{{ $item['name'] }}">
+                                                @else
+                                                    <div class="bg-light d-flex align-items-center justify-content-center h-100 w-100">
+                                                        <i class="fas fa-image text-muted"></i>
+                                                    </div>
+                                                @endif
                                             </div>
                                             <div>
                                                 <h6 class="fw-bold mb-1">{{ $item['name'] }}</h6>

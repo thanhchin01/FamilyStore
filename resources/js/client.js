@@ -53,6 +53,18 @@ const initClientScripts = () => {
     }
 };
 
+// Handle Preloader Dismissal
+window.addEventListener('load', () => {
+    const preloader = document.getElementById('preloader');
+    if (preloader) {
+        preloader.classList.add('fade-out');
+        // Ensure it is removed from DOM after animation
+        setTimeout(() => {
+            preloader.style.display = 'none';
+        }, 600);
+    }
+});
+
 // Application Launch
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initClientScripts);

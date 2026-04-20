@@ -16,8 +16,11 @@ use App\Http\Controllers\Auth\AuthController;
 require __DIR__ . '/client.php';
 
 // Authentication routes
-// Auth Routes
-Route::post('/login', [AuthController::class, 'login'])->name('login');
+Route::get('/login', function() {
+    return redirect()->route('client.home')->with('info', 'Vui lòng đăng nhập để tiếp tục.');
+})->name('login');
+
+Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register'])->name('register');
 
 Route::get('/admin/login', [AuthController::class, 'showAdminLoginForm'])->name('admin.login');

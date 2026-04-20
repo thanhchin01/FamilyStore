@@ -75,42 +75,47 @@
 
         <div class="swiper featured-swiper pb-5">
             <div class="swiper-wrapper">
-                @php
-                $mockProducts = [
-                    ['name' => 'Máy giặt Panasonic Inverter 10kg', 'price' => 12500000, 'img' => 'https://images.unsplash.com/photo-1545173168-9f1947eebb7f?q=80&w=400&auto=format&fit=crop'],
-                    ['name' => 'Tủ lạnh Samsung Bespoke 400L', 'price' => 25900000, 'img' => 'https://images.unsplash.com/photo-1571175488180-ef9b64261bd0?q=80&w=400&auto=format&fit=crop'],
-                    ['name' => 'Nồi chiên không dầu Philips XXL', 'price' => 4500000, 'img' => 'https://images.unsplash.com/photo-1584286595398-a59f21d313f5?q=80&w=400&auto=format&fit=crop'],
-                    ['name' => 'Quạt cây điều khiển từ xa Hatari', 'price' => 1200000, 'img' => 'https://images.unsplash.com/photo-1585338107529-13afc5f02586?q=80&w=400&auto=format&fit=crop'],
-                    ['name' => 'Smart TV LG Oled C3 55 inch', 'price' => 32000000, 'img' => 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?q=80&w=400&auto=format&fit=crop'],
-                    ['name' => 'Máy hút bụi không dây Dyson V15', 'price' => 18900000, 'img' => 'https://images.unsplash.com/photo-1527515637462-cff94eecc1ac?q=80&w=400&auto=format&fit=crop'],
-                    ['name' => 'Bếp từ Bosch 3 vùng nấu', 'price' => 15500000, 'img' => 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?q=80&w=400&auto=format&fit=crop'],
-                    ['name' => 'Máy ép chậm Hurom H310', 'price' => 7800000, 'img' => 'https://images.unsplash.com/photo-1622597467827-02302307fc8b?q=80&w=400&auto=format&fit=crop'],
-                ];
-                @endphp
-
-                @for($i = 1; $i <= 20; $i++)
-                @php $p = $mockProducts[($i-1) % count($mockProducts)]; @endphp
+                @foreach($products as $product)
                 <div class="swiper-slide animate-product-card">
                     <div class="product-card h-100 mb-0">
                         <div class="product-img-wrapper">
-                            <span class="badge bg-danger position-absolute top-0 start-0 m-3 z-3">NEW</span>
-                            <img src="{{ $p['img'] }}" alt="{{ $p['name'] }}">
+                            @if($product->created_at > now()->subDays(7))
+                                <span class="badge bg-danger position-absolute top-0 start-0 m-3 z-3">NEW</span>
+                            @endif
+                            
+                            @if($product->image)
+                                <img src="{{ Str::startsWith($product->image, 'http') ? $product->image : asset('storage/' . $product->image) }}" alt="{{ $product->name }}">
+                            @else
+                                <div class="bg-light d-flex align-items-center justify-content-center" style="height: 250px;">
+                                    <i class="fas fa-image fa-3x text-muted"></i>
+                                </div>
+                            @endif
+
                             <div class="product-actions">
-                                <button class="btn btn-sm btn-white rounded-circle shadow-sm p-2"><i class="far fa-heart text-danger"></i></button>
-                                <a href="#" class="btn btn-sm btn-white rounded-circle shadow-sm p-2"><i class="fas fa-expand text-primary-color"></i></a>
+                                <button type="button" class="btn btn-sm btn-white rounded-circle shadow-sm p-2"><i class="far fa-heart text-danger"></i></button>
+                                <a href="{{ route('client.products.show', $product->slug) }}" class="btn btn-sm btn-white rounded-circle shadow-sm p-2"><i class="fas fa-expand text-primary-color"></i></a>
                             </div>
                         </div>
                         <div class="product-details text-center">
-                            <span class="category-label">TOP SELLING</span>
-                            <h5 class="fw-bold mb-2 h6"><a href="#" class="text-dark text-decoration-none">{{ $p['name'] }} #{{ $i }}</a></h5>
+                            <span class="category-label text-uppercase">{{ $product->category->name ?? 'NỔI BẬT' }}</span>
+                            <h5 class="fw-bold mb-2 h6" style="min-height: 40px;">
+                                <a href="{{ route('client.products.show', $product->slug) }}" class="text-dark text-decoration-none">{{ $product->name }}</a>
+                            </h5>
                             <div class="product-price mt-3">
-                                {{ number_format($p['price']) }}đ
+                                {{ number_format($product->price) }}đ
                             </div>
-                            <button class="btn btn-primary-custom w-100 mt-3 py-2 extra-small fw-bold rounded-pill shadow-sm">THÊM VÀO GIỎ</button>
+                            <div class="d-flex gap-2 mt-3">
+                                <button type="button" 
+                                        class="btn btn-outline-primary-custom flex-grow-1 py-1 extra-small fw-600 rounded-pill add-to-cart-btn"
+                                        data-id="{{ $product->id }}">
+                                    THÊM GIỎ
+                                </button>
+                                <a href="{{ route('client.cart') }}" class="btn btn-primary-custom flex-grow-1 py-1 extra-small fw-600 rounded-pill">MUA NGAY</a>
+                            </div>
                         </div>
                     </div>
                 </div>
-                @endfor
+                @endforeach
             </div>
             
             <!-- Add Pagination -->

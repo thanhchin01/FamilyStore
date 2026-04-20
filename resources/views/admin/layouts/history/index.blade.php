@@ -1,250 +1,129 @@
 @extends('admin.layout')
 
-@section('title', 'Lich sử bán hàng')
+@section('title', 'Lịch sử bán hàng - Gia dụng Khoa Quyên')
 
 @section('content')
     <div class="sales-history-container py-4">
-
         <div class="mb-4">
-            <h4 class="fw-bold">Lịch sử bán hàng</h4>
-            <p class="text-muted small">Theo dõi các hóa đơn đã bán</p>
+            <h4 class="fw-bold font-luxury text-primary">Lịch sử bán hàng</h4>
+            <p class="text-muted small">Tra cứu và quản lý hóa đơn đã phát sinh</p>
         </div>
 
-        <!-- Bộ lọc -->
-        <div class="card filter-card mb-4 p-3">
-            <div class="row g-3 align-items-end">
-                <div class="col-md-3">
-                    <label class="form-label-custom">Từ ngày</label>
-                    <input type="date" class="form-control">
-                </div>
+        <!-- Bộ lọc cao cấp -->
+        <div class="card shadow-sm border-0 rounded-4 mb-4 p-4 bg-white">
+            <form method="GET" action="{{ route('admin.history') }}">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-3">
+                        <label class="form-label-custom fw-bold small text-uppercase">Khoảng thời gian</label>
+                        <div class="input-group">
+                            <input type="date" name="from" class="form-control border-light shadow-sm bg-light-subtle" value="{{ request('from') }}">
+                            <span class="input-group-text bg-light border-light">đến</span>
+                            <input type="date" name="to" class="form-control border-light shadow-sm bg-light-subtle" value="{{ request('to') }}">
+                        </div>
+                    </div>
 
-                <div class="col-md-3">
-                    <label class="form-label-custom">Đến ngày</label>
-                    <input type="date" class="form-control">
-                </div>
+                    <div class="col-md-3">
+                        <label class="form-label-custom fw-bold small text-uppercase">Trạng thái nợ</label>
+                        <select name="debt_status" class="form-select border-light shadow-sm">
+                            <option value="">-- Tất cả trạng thái --</option>
+                            <option value="paid" {{ request('debt_status') == 'paid' ? 'selected' : '' }}>Đã trả đủ</option>
+                            <option value="debt" {{ request('debt_status') == 'debt' ? 'selected' : '' }}>Còn nợ lại</option>
+                        </select>
+                    </div>
 
-                <div class="col-md-3">
-                    <label class="form-label-custom">Trạng thái</label>
-                    <select class="form-select">
-                        <option value="">-- Tất cả --</option>
-                        <option value="paid">Đã trả đủ</option>
-                        <option value="debt">Còn nợ</option>
-                    </select>
-                </div>
+                    <div class="col-md-3">
+                        <label class="form-label-custom fw-bold small text-uppercase">Lọc theo khách</label>
+                        <select name="customer_type" class="form-select border-light shadow-sm">
+                            <option value="">-- Tất cả loại khách --</option>
+                            <option value="guest" {{ request('customer_type') == 'guest' ? 'selected' : '' }}>Khách vãng lai</option>
+                            <option value="customer" {{ request('customer_type') == 'customer' ? 'selected' : '' }}>Khách quen (Có nợ)</option>
+                        </select>
+                    </div>
 
-                <div class="col-md-3">
-                    <label class="form-label-custom">Loại khách</label>
-                    <select class="form-select">
-                        <option value="">-- Tất cả --</option>
-                        <option value="guest">Khách lẻ</option>
-                        <option value="customer">Khách quen</option>
-                    </select>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-primary w-100 rounded-pill fw-bold shadow-sm">
+                            <i class="fas fa-filter me-2"></i>Áp dụng lọc
+                        </button>
+                    </div>
                 </div>
-            </div>
+            </form>
         </div>
 
         <!-- Bảng lịch sử -->
-        <div class="card history-table-card">
+        <div class="card shadow-sm border-0 rounded-4 bg-white overflow-hidden">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
                     <thead class="table-light">
-                        <tr>
-                            <th>#</th>
+                        <tr class="small text-uppercase fw-bold text-muted">
+                            <th class="ps-4 py-3">Mã đơn</th>
                             <th>Ngày bán</th>
                             <th>Sản phẩm</th>
                             <th>Khách hàng</th>
-                            <th>SL</th>
-                            <th>Thành tiền</th>
+                            <th>Tổng tiền</th>
                             <th>Trạng thái</th>
-                            <th class="text-end">Thao tác</th>
+                            <th class="text-end pe-4">Thao tác</th>
                         </tr>
                     </thead>
-                    {{-- <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>20/02/2026</td>
-                            <td>Nồi cơm Sharp 1.8L</td>
-                            <td>
-                                <span class="fw-semibold">Nguyễn Văn A</span><br>
-                                <small class="text-muted">0909xxx999</small>
-                            </td>
-                            <td>1</td>
-                            <td class="fw-bold text-primary">1.200.000đ</td>
-                            <td>
-                                <span class="badge bg-success">Đã trả đủ</span>
-                            </td>
-                            <td class="text-end">
-                                <button class="btn btn-sm btn-outline-primary">
-                                    <i class="fa-solid fa-eye"></i>
-                                </button>
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td>2</td>
-                            <td>20/02/2026</td>
-                            <td>Ấm Sunhouse Inox</td>
-                            <td>
-                                <span class="fw-semibold">Trần Thị B</span><br>
-                                <small class="text-muted">Còn nợ</small>
-                            </td>
-                            <td>2</td>
-                            <td class="fw-bold text-danger">700.000đ</td>
-                            <td>
-                                <span class="badge bg-warning text-dark">Còn nợ</span>
-                            </td>
-                            <td class="text-end">
-                                <button class="btn btn-sm btn-outline-primary">
-                                    <i class="fa-solid fa-eye"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    </tbody> --}}
                     <tbody>
                         @foreach ($sales as $sale)
+                            @php 
+                                // Chuẩn bị dữ liệu cho Modal
+                                $saleData = $sale->toArray();
+                                $saleData['formatted_date'] = $sale->created_at->format('d/m/Y H:i');
+                                $saleData['product'] = $sale->product;
+                                $saleData['customer'] = $sale->customer ? $sale->customer->load('debt') : null;
+                            @endphp
                             <tr>
-                                <td>{{ $sale->id }}</td>
-                                <td>{{ $sale->created_at->format('d/m/Y') }}</td>
-                                <td>{{ $sale->product->name }}</td>
-                                {{-- <td>
-                                    <span class="fw-semibold">Nguyễn Văn A</span><br>
-                                    <small class="text-muted">0909xxx999</small>
-                                </td> --}}
+                                <td class="ps-4 fw-bold text-primary">#{{ $sale->invoice_code ?? $sale->id }}</td>
+                                <td class="small">{{ $sale->created_at->format('d/m/Y') }}</td>
                                 <td>
-                                    <strong>{{ $sale->customer?->name ?? 'Khách lẻ' }}</strong><br>
-                                    <small>{{ $sale->customer?->phone }}</small>
-                                </td>
-                                <td>{{ $sale->quantity }}</td>
-                                <td class="fw-bold">
-                                    {{ number_format($sale->total) }}đ
+                                    <div class="fw-medium text-dark">{{ $sale->product->name }}</div>
+                                    <div class="extra-small text-muted">Số lượng: {{ $sale->quantity }}</div>
                                 </td>
                                 <td>
-                                    @if ($sale->debt > 0)
-                                        <span class="badge bg-warning text-dark">Còn nợ</span>
-                                    @else
-                                        <span class="badge bg-success">Đã trả đủ</span>
+                                    <strong>{{ $sale->customer?->name ?? 'Khách lẻ' }}</strong>
+                                    @if($sale->customer?->phone)
+                                        <div class="extra-small text-muted">{{ $sale->customer->phone }}</div>
                                     @endif
                                 </td>
-                                <td class="text-end">
-                                    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
-                                        data-bs-target="#saleDetailModal-{{ $sale->id }}">
-                                        Xem chi tiết
+                                <td class="fw-bold">{{ number_format($sale->total) }}đ</td>
+                                <td>
+                                    @if ($sale->debt > 0)
+                                        <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3">Còn nợ</span>
+                                    @else
+                                        <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3">Đã trả đủ</span>
+                                    @endif
+                                </td>
+                                <td class="text-end pe-4">
+                                    <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 shadow-sm" 
+                                        onclick="openSaleDetailModal({{ json_encode($saleData) }})">
+                                        <i class="fa-solid fa-eye me-1"></i> Chi tiết
                                     </button>
                                 </td>
                             </tr>
-                            <!-- Modal xem chi tiết hoá đơn -->
-                            <div class="modal fade" id="saleDetailModal-{{ $sale->id }}" tabindex="-1"
-                                aria-labelledby="saleDetailModalLabel-{{ $sale->id }}" aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-centered">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title fw-bold" id="saleDetailModalLabel-{{ $sale->id }}">
-                                                Hóa đơn #{{ $sale->id }}
-                                            </h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <div class="mb-3">
-                                                <div class="small text-muted">Ngày bán</div>
-                                                <div>{{ $sale->created_at->format('d/m/Y H:i') }}</div>
-                                            </div>
-
-                                            <div class="mb-3">
-                                                <div class="small text-muted">Sản phẩm</div>
-                                                <div class="fw-semibold">{{ $sale->product->name }}</div>
-                                                <div class="small text-muted">
-                                                    Số lượng: {{ $sale->quantity }} |
-                                                    Đơn giá: {{ number_format($sale->price) }}đ
-                                                </div>
-                                            </div>
-
-                                            <div class="mb-3">
-                                                <div class="small text-muted">Thông tin khách hàng</div>
-                                                <div>
-                                                    <strong>{{ $sale->customer?->name ?? 'Khách lẻ' }}</strong><br>
-                                                    @if ($sale->customer?->phone)
-                                                        <span class="text-primary fw-semibold">SĐT:
-                                                            {{ $sale->customer->phone }}</span><br>
-                                                    @endif
-                                                    @if ($sale->customer?->address)
-                                                        <small class="text-muted">Địa chỉ:
-                                                            {{ $sale->customer->address }}</small><br>
-                                                    @endif
-                                                    @if ($sale->customer?->relative_name)
-                                                        <small class="text-muted">Người thân:
-                                                            {{ $sale->customer->relative_name }}</small><br>
-                                                    @endif
-                                                    @if ($sale->customer?->debt && $sale->customer->debt->total_debt > 0)
-                                                        <small class="text-danger fw-semibold">Tổng nợ hiện tại:
-                                                            {{ number_format($sale->customer->debt->total_debt) }}đ</small>
-                                                    @endif
-                                                </div>
-                                            </div>
-
-                                            <div class="mb-3">
-                                                <div class="small text-muted">Thanh toán</div>
-                                                <div class="d-flex justify-content-between">
-                                                    <span>Tổng tiền hóa đơn:</span>
-                                                    <span class="fw-semibold">{{ number_format($sale->total) }}đ</span>
-                                                </div>
-                                                <div class="d-flex justify-content-between">
-                                                    <span>Khách đã trả:</span>
-                                                    <span>{{ number_format($sale->paid_amount ?? 0) }}đ</span>
-                                                </div>
-                                                <div class="d-flex justify-content-between">
-                                                    <span>Còn nợ lại:</span>
-                                                    <span
-                                                        class="{{ $sale->debt > 0 ? 'text-danger fw-bold' : 'text-success' }}">
-                                                        {{ number_format($sale->debt) }}đ
-                                                    </span>
-                                                </div>
-                                                <div class="mt-2">
-                                                    @if ($sale->debt > 0)
-                                                        <span class="badge bg-warning text-dark">Đang còn nợ</span>
-                                                    @else
-                                                        <span class="badge bg-success">Đã thanh toán đủ</span>
-                                                    @endif
-                                                </div>
-                                            </div>
-
-                                            @if ($sale->customer && $sale->customer->debt && $sale->customer->debt->total_debt > 0)
-                                                <hr>
-                                                <div class="mb-0">
-                                                    <div class="small fw-bold text-muted mb-2">Trả nợ</div>
-                                                    <form action="{{ route('admin.debt.pay') }}" method="POST"
-                                                        class="d-flex gap-2 align-items-end flex-wrap">
-                                                        @csrf
-                                                        <input type="hidden" name="customer_id" value="{{ $sale->customer->id }}">
-                                                        <div class="flex-grow-1">
-                                                            <label class="form-label small mb-0">Số tiền trả (đ)</label>
-                                                            <input type="number" name="amount" class="form-control form-control-sm"
-                                                                min="1" max="{{ $sale->customer->debt->total_debt }}"
-                                                                placeholder="Tối đa {{ number_format($sale->customer->debt->total_debt) }}đ"
-                                                                required>
-                                                        </div>
-                                                        <div>
-                                                            <label class="form-label small mb-0">&nbsp;</label>
-                                                            <button type="submit" class="btn btn-success btn-sm">
-                                                                <i class="fa-solid fa-money-bill-transfer me-1"></i> Ghi
-                                                                nhận trả nợ
-                                                            </button>
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                            @endif
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-light border"
-                                                data-bs-dismiss="modal">Đóng</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         @endforeach
+                        @if($sales->isEmpty())
+                            <tr>
+                                <td colspan="7" class="text-center py-5 text-muted">Không tìm thấy dữ liệu hóa đơn nào.</td>
+                            </tr>
+                        @endif
                     </tbody>
                 </table>
             </div>
+            
+            @if($sales->hasPages())
+                <div class="p-4 border-top d-flex justify-content-center">
+                    {{ $sales->links() }}
+                </div>
+            @endif
         </div>
     </div>
+
+    @include('admin.components.sale-history-detail-modal')
 @endsection
+
+<style>
+.form-label-custom { font-size: 0.75rem; color: #64748b; margin-bottom: 0.5rem; display: block; }
+.extra-small { font-size: 0.72rem; }
+.font-luxury { font-family: 'Playfair Display', serif; }
+</style>

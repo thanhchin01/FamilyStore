@@ -11,8 +11,10 @@ Route::prefix('admin')
     ->middleware(['auth', 'admin'])
     ->group(function () {
         Route::get('/', [AdminController::class, 'index'])->name('dashboard');
+        Route::get('/notifications/counts', [AdminController::class, 'getNotificationCounts'])->name('notifications.counts');
         Route::get('/inventory', [AdminController::class, 'inventory'])->name('inventory');
 
+        Route::get('/orders', [AdminController::class, 'orders'])->name('orders.index');
         Route::get('/sale', [AdminController::class, 'sale'])->name('sale');
         Route::post('/sale', [SaleController::class, 'store'])
             ->name('sale.store')
@@ -34,4 +36,9 @@ Route::prefix('admin')
         Route::delete('/products/{slug}', [ProductController::class, 'destroy'])->name('products.destroy');
 
         Route::get('/statistics', [AdminController::class, 'statistics'])->name('statistics');
+
+        // Chat Management
+        Route::get('/chat', [\App\Http\Controllers\ChatController::class, 'adminIndex'])->name('chat.index');
+        Route::get('/chat/messages/{id}', [\App\Http\Controllers\ChatController::class, 'adminGetMessages'])->name('chat.messages');
+        Route::post('/chat/reply/{id}', [\App\Http\Controllers\ChatController::class, 'adminReply'])->name('chat.reply');
     });

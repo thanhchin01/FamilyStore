@@ -3,163 +3,180 @@
 namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
-
+use App\Services\Client\CartService;
+use App\Services\Client\OrderService;
 use Illuminate\Http\Request;
+use App\Models\Products;
+use App\Models\Categories;
 
 class StoreController extends Controller
 {
+    protected $cartService;
+    protected $orderService;
+    protected $paymentService;
+
+    public function __construct(CartService $cartService, OrderService $orderService, \App\Services\Client\PaymentService $paymentService)
+    {
+        $this->cartService = $cartService;
+        $this->orderService = $orderService;
+        $this->paymentService = $paymentService;
+    }
+
     public function home()
     {
-        $products = [
-            [
-                'id' => 1,
-                'name' => 'Máy giặt Panasonic Inverter 10kg',
-                'price' => 12500000,
-                'image' => 'https://images.unsplash.com/photo-1545173168-9f1947eebb7f?q=80&w=1000&auto=format&fit=crop',
-                'slug' => 'may-giat-panasonic-inverter-10kg',
-                'description' => 'Máy giặt Panasonic với công nghệ Inverter tiết kiệm điện năng và bảo vệ sợi vải.'
-            ],
-            [
-                'id' => 2,
-                'name' => 'Tủ lạnh Samsung Bespoke 400L',
-                'price' => 25900000,
-                'image' => 'https://images.unsplash.com/photo-1571175488180-ef9b64261bd0?q=80&w=1000&auto=format&fit=crop',
-                'slug' => 'tu-lanh-samsung-bespoke-400l',
-                'description' => 'Tủ lạnh thiết kế tinh tế, sang trọng với các ngăn linh hoạt.'
-            ],
-            [
-                'id' => 3,
-                'name' => 'Nồi chiên không dầu Philips XXL',
-                'price' => 4500000,
-                'image' => 'https://images.unsplash.com/photo-1584286595398-a59f21d313f5?q=80&w=1000&auto=format&fit=crop',
-                'slug' => 'noi-chien-khong-dau-philips-xxl',
-                'description' => 'Nồi chiên không dầu công suất lớn, giảm 80% dầu mỡ dư thừa.'
-            ],
-            [
-                'id' => 4,
-                'name' => 'Quạt cây điều khiển từ xa Hatari',
-                'price' => 1200000,
-                'image' => 'https://images.unsplash.com/photo-1585338107529-13afc5f02586?q=80&w=1000&auto=format&fit=crop',
-                'slug' => 'quat-cay-hatari',
-                'description' => 'Quạt cây nhập khẩu Thái Lan, siêu bền và êm ái.'
-            ],
-            [
-                'id' => 5,
-                'name' => 'Smart TV LG Oled C3 55 inch',
-                'price' => 32000000,
-                'image' => 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?q=80&w=1000&auto=format&fit=crop',
-                'slug' => 'smart-tv-lg-oled-c3',
-                'description' => 'Trải nghiệm hình ảnh chân thực với công nghệ OLED của LG.'
-            ],
-            [
-                'id' => 6,
-                'name' => 'Máy hút bụi không dây Dyson V15',
-                'price' => 18900000,
-                'image' => 'https://images.unsplash.com/photo-1527515637462-cff94eecc1ac?q=80&w=1000&auto=format&fit=crop',
-                'slug' => 'may-hut-bui-dyson-v15',
-                'description' => 'Máy hút bụi mạnh mẽ nhất của Dyson với công nghệ laser.'
-            ],
-            [
-                'id' => 7,
-                'name' => 'Bếp từ Bosch 3 vùng nấu',
-                'price' => 15500000,
-                'image' => 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?q=80&w=1000&auto=format&fit=crop',
-                'slug' => 'bep-tu-bosch-3-vung-nau',
-                'description' => 'Bếp từ Bosch chất lượng Đức, nấu nhanh và an toàn.'
-            ],
-            [
-                'id' => 8,
-                'name' => 'Máy ép chậm Hurom H310',
-                'price' => 7800000,
-                'image' => 'https://images.unsplash.com/photo-1622597467827-02302307fc8b?q=80&w=1000&auto=format&fit=crop',
-                'slug' => 'may-ep-cham-hurom-h310',
-                'description' => 'Máy ép chậm nhỏ gọn, giữ trọn vẹn dưỡng chất trong trái cây.'
-            ],
-        ];
+        $products = Products::where('is_active', true)
+            ->where('is_featured', true)
+            ->latest()
+            ->take(8)
+            ->get();
 
         return view('client.layouts.home.index', compact('products'));
     }
 
     public function productDetail($slug)
     {
-        // Mocking a product
-        $product = [
-            'id' => 1,
-            'name' => 'Sản phẩm cao cấp',
-            'price' => 1500000,
-            'image' => 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1000&auto=format&fit=crop',
-            'slug' => $slug,
-            'description' => 'Đây là mô tả chi tiết cho sản phẩm. Sản phẩm có chất lượng cao, bền bỉ và đẹp mắt.',
-            'specs' => [
-                'Chất liệu' => 'Da thật',
-                'Kích thước' => '20 x 10 cm',
-                'Màu sắc' => 'Đen, Nâu'
-            ]
-        ];
+        $product = Products::with(['category', 'productImages'])
+            ->where('slug', $slug)
+            ->firstOrFail();
 
         return view('client.layouts.product.show', compact('product'));
     }
 
     public function cart()
     {
-        $cartItems = [
-            [
-                'id' => 1,
-                'name' => 'Sản phẩm 1',
-                'price' => 100000,
-                'quantity' => 2,
-                'image' => 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1000&auto=format&fit=crop',
-            ],
-            [
-                'id' => 2,
-                'name' => 'Sản phẩm 2',
-                'price' => 200000,
-                'quantity' => 1,
-                'image' => 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=1000&auto=format&fit=crop',
-            ]
-        ];
+        $cartItems = $this->cartService->getCart();
+        $total = $this->cartService->subtotal();
 
-        $total = array_sum(array_map(fn($item) => $item['price'] * $item['quantity'], $cartItems));
-
-        return view('client.layouts.cart.index', compact('cartItems', 'total'));
+        return view('client.layouts.cart.index', [
+            'cartItems' => $cartItems,
+            'total' => $total
+        ]);
     }
+
+    public function addToCart(Request $request)
+    {
+        $productId = $request->input('product_id');
+        $quantity = $request->input('quantity', 1);
+
+        $cart = $this->cartService->add($productId, $quantity);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Sản phẩm đã được thêm vào giỏ hàng!',
+                'cart_count' => count($cart)
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Sản phẩm đã được thêm vào giỏ hàng!');
+    }
+
     public function products(Request $request)
     {
-        $products = [
-            [
-                'id' => 1,
-                'name' => 'Máy giặt Panasonic Inverter 10kg',
-                'price' => 12500000,
-                'image' => 'https://images.unsplash.com/photo-1545173168-9f1947eebb7f?q=80&w=1000&auto=format&fit=crop',
-                'slug' => 'may-giat-panasonic-inverter-10kg',
-                'description' => 'Máy giặt Panasonic với công nghệ Inverter tiết kiệm điện năng và bảo vệ sợi vải.'
-            ],
-            [
-                'id' => 2,
-                'name' => 'Tủ lạnh Samsung Bespoke 400L',
-                'price' => 25900000,
-                'image' => 'https://images.unsplash.com/photo-1571175488180-ef9b64261bd0?q=80&w=1000&auto=format&fit=crop',
-                'slug' => 'tu-lanh-samsung-bespoke-400l',
-                'description' => 'Tủ lạnh thiết kế tinh tế, sang trọng với các ngăn linh hoạt.'
-            ],
-            [
-                'id' => 3,
-                'name' => 'Nồi chiên không dầu Philips XXL',
-                'price' => 4500000,
-                'image' => 'https://images.unsplash.com/photo-1584286595398-a59f21d313f5?q=80&w=1000&auto=format&fit=crop',
-                'slug' => 'noi-chien-khong-dau-philips-xxl',
-                'description' => 'Nồi chiên không dầu công suất lớn, giảm 80% dầu mỡ dư thừa.'
-            ],
-            [
-                'id' => 4,
-                'name' => 'Quạt cây điều khiển từ xa Hatari',
-                'price' => 1200000,
-                'image' => 'https://images.unsplash.com/photo-1585338107529-13afc5f02586?q=80&w=1000&auto=format&fit=crop',
-                'slug' => 'quat-cay-hatari',
-                'description' => 'Quạt cây nhập khẩu Thái Lan, siêu bền và êm ái.'
-            ],
+        $query = Products::query()->where('is_active', true);
+
+        // Filter by category
+        if ($request->filled('category')) {
+            $query->whereHas('category', function($q) use ($request) {
+                $q->where('slug', $request->category);
+            });
+        }
+
+        // Filter by brand
+        if ($request->filled('brand')) {
+            $query->where('brand', $request->brand);
+        }
+
+        // Filter by price range
+        if ($request->filled('price_range')) {
+            switch ($request->price_range) {
+                case '1': $query->where('price', '<', 5000000); break;
+                case '2': $query->whereBetween('price', [5000000, 15000000]); break;
+                case '3': $query->whereBetween('price', [15000000, 30000000]); break;
+                case '4': $query->where('price', '>', 30000000); break;
+            }
+        }
+
+        // Sorting
+        $sort = $request->get('sort', 'newest');
+        switch ($sort) {
+            case 'price_asc': $query->orderBy('price', 'asc'); break;
+            case 'price_desc': $query->orderBy('price', 'desc'); break;
+            default: $query->orderBy('created_at', 'desc'); break;
+        }
+
+        $products = $query->paginate(12);
+        $categories = Categories::where('is_active', true)->get();
+        $brands = Products::select('brand')->distinct()->whereNotNull('brand')->pluck('brand');
+
+        return view('client.layouts.product.index', compact('products', 'categories', 'brands'));
+    }
+
+    public function checkout()
+    {
+        $cartItems = $this->cartService->getCart();
+        if (empty($cartItems)) {
+            return redirect()->route('client.products.index')->with('info', 'Giỏ hàng của bạn đang trống.');
+        }
+
+        $total = $this->cartService->subtotal();
+
+        return view('client.layouts.checkout.index', [
+            'cartItems' => $cartItems,
+            'total' => $total
+        ]);
+    }
+
+    /**
+     * Xử lý đặt hàng (Place Order)
+     */
+    public function placeOrder(Request $request)
+    {
+        $request->validate([
+            'shipping_name'    => 'required|string|max:255',
+            'shipping_phone'   => 'required|string|max:20',
+            'shipping_address' => 'required|string',
+            'payment_method'   => 'required|in:cod,transfer',
+        ]);
+
+        $cartItems = $this->cartService->getCart();
+        if (empty($cartItems)) {
+            return redirect()->route('client.products.index')->with('error', 'Giỏ hàng trống.');
+        }
+
+        $subtotal = $this->cartService->subtotal();
+        
+        $orderData = [
+            'customer_id'      => null, // Có thể mở rộng nếu có bảng Customers riêng
+            'subtotal'         => $subtotal,
+            'shipping_fee'     => 0, // Mặc định freeship
+            'grand_total'      => $subtotal,
+            'payment_method'   => $request->payment_method,
+            'shipping_name'    => $request->shipping_name,
+            'shipping_phone'   => $request->shipping_phone,
+            'shipping_address' => $request->shipping_address,
+            'note'             => $request->note,
+            'items'            => array_map(function($item) {
+                return [
+                    'product_id' => $item['id'],
+                    'quantity'   => $item['quantity'],
+                    'price'      => $item['price']
+                ];
+            }, array_values($cartItems))
         ];
 
-        return view('client.layouts.product.index', compact('products'));
+        try {
+            $order = $this->orderService->createOrder($orderData);
+            
+            // Khởi tạo bản ghi thanh toán
+            $this->paymentService->initializePayment($order, $request->payment_method);
+
+            // Xóa giỏ hàng
+            $this->cartService->clear();
+
+            return redirect()->route('client.home')->with('success', 'Đơn hàng #' . $order->order_code . ' đã được đặt thành công!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage())->withInput();
+        }
     }
 }

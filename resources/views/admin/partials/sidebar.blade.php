@@ -41,6 +41,12 @@
                 </a>
             </li>
             <li class="sidebar-item">
+                <a href="{{ route('admin.chat.index') }}"
+                    class="sidebar-link {{ request()->routeIs('admin.chat.*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-comments"></i> Trung tâm tin nhắn
+                </a>
+            </li>
+            <li class="sidebar-item">
                 <a href="{{ route('admin.statistics') }}"
                     class="sidebar-link {{ request()->routeIs('admin.statistics') ? 'active' : '' }}">
                     <i class="fa-solid fa-chart-area"></i> Thống kê

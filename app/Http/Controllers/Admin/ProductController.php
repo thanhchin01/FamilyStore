@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Products;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\Admin\Product\StoreProductRequest;
 use App\Http\Requests\Admin\Product\UpdateProductRequest;
 
@@ -43,7 +44,7 @@ class ProductController extends Controller
      */
     public function store(StoreProductRequest $request)
     {
-        $product = Products::create([
+        $data = [
             'name'                  => $request->name,
             'slug'                  => $this->generateUniqueSlug($request->name),
             'category_id'           => $request->category_id,
@@ -51,14 +52,20 @@ class ProductController extends Controller
             'model'                 => $request->model,
             'price'                 => $request->price,
             'warranty_months'       => $request->warranty_months ?? 0,
-            'stock'                 => 0, // Khởi tạo bằng 0, inventory service sẽ cộng lên
+            'stock'                 => 0,
             'description'           => $request->description,
             'is_active'             => true,
-        ]);
+        ];
+
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('products', 'public');
+        }
+
+        $product = Products::create($data);
 
         // Nếu có số lượng tồn đầu kỳ > 0, ghi nhận vào kho
         if ($request->stock > 0) {
-            $inventoryService = app(\App\Services\InventoryService::class);
+            $inventoryService = app(\App\Services\Admin\InventoryService::class);
             $inventoryService->importProduct($product->id, (int) $request->stock, 'Khởi tạo tồn kho khi thêm sản phẩm');
         }
 
@@ -72,7 +79,7 @@ class ProductController extends Controller
     {
         $product = Products::where('slug', $slug)->firstOrFail();
 
-        $product->update([
+        $data = [
             'name'            => $request->name,
             'slug'            => $this->generateUniqueSlug($request->name, $product->id),
             'category_id'     => $request->category_id,
@@ -82,7 +89,17 @@ class ProductController extends Controller
             'price'           => $request->price,
             'stock'           => $request->stock,
             'description'     => $request->description,
-        ]);
+        ];
+
+        if ($request->hasFile('image')) {
+            // Xóa ảnh cũ nếu có
+            if ($product->image) {
+                Storage::disk('public')->delete($product->image);
+            }
+            $data['image'] = $request->file('image')->store('products', 'public');
+        }
+
+        $product->update($data);
 
         return redirect()
             ->back()

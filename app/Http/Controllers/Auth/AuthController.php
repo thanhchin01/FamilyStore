@@ -61,13 +61,13 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials, $request->filled('remember'))) {
             $user = Auth::user();
-            
+
             // Ngăn chặn Admin đăng nhập qua trang Client
             if ($user->role === 'admin') {
                 Auth::logout();
                 $request->session()->invalidate();
                 $request->session()->regenerateToken();
-                
+
                 if ($request->ajax()) {
                     return response()->json([
                         'success' => false,
@@ -90,13 +90,16 @@ class AuthController extends Controller
                 ]);
             }
 
-            return redirect()->intended(route('client.home'))->with('success', 'Đăng nhập thành công.');
+            return redirect()->intended(route('client.home'))->with('client_success', 'Đăng nhập thành công.');
         }
 
         if ($request->ajax()) {
+            $userExists = \App\Models\User::where('email', $request->email)->exists();
+            $message = $userExists ? 'Mật khẩu không chính xác.' : 'Email này chưa được đăng ký.';
+
             return response()->json([
                 'success' => false,
-                'message' => 'Email hoặc mật khẩu không chính xác.'
+                'message' => $message
             ], 422);
         }
 
@@ -119,31 +122,35 @@ class AuthController extends Controller
                 $request->session()->invalidate();
                 $request->session()->regenerateToken();
                 throw ValidationException::withMessages([
-                    'username' => ['Bạn không có quyền truy cập vào hệ thống này.'],
+                    'username' => ['Tài khoản này không có quyền truy cập quản trị.'],
                 ]);
             }
 
             $request->session()->regenerate();
-            return redirect()->intended(route('admin.dashboard'))->with('success', 'Chào mừng Admin quay trở lại.');
+            return redirect()->intended(route('admin.dashboard'))->with('admin_success', 'Chào mừng Admin quay trở lại.');
         }
 
+        // Tùy chỉnh thông báo lỗi chi tiết
+        $userExists = \App\Models\User::where('username', $request->username)->exists();
+        $message = $userExists ? 'Mật khẩu quản trị không chính xác.' : 'Tên đăng nhập không tồn tại trong hệ thống.';
+
         throw ValidationException::withMessages([
-            'username' => [trans('auth.failed')],
+            'username' => [$message],
         ]);
     }
 
     public function logout(Request $request)
     {
         $isAdmin = Auth::check() && Auth::user()->role === 'admin';
-        
+
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
         if ($isAdmin) {
-            return redirect()->route('admin.login')->with('success', 'Đã đăng xuất khỏi hệ thống quản trị.');
+            return redirect()->route('admin.login')->with('admin_success', 'Đã đăng xuất khỏi hệ thống quản trị.');
         }
 
-        return redirect('/')->with('success', 'Đã đăng xuất.');
+        return redirect('/')->with('client_success', 'Đã đăng xuất.');
     }
 }

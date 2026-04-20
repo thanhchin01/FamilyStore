@@ -1,6 +1,6 @@
 @extends('admin.layout')
 
-@section('title', 'Quản lý kho hàng')
+@section('title', 'Quản lý kho hàng - Gia dụng Khoa Quyên')
 
 @section('content')
     <div class="inventory-wrapper py-4">
@@ -9,39 +9,42 @@
             $countLowStock = $products->where('stock', '>', 0)->where('stock', '<=', 5)->count();
             $countInStock = $products->where('stock', '>', 5)->count();
         @endphp
+
         <!-- Header -->
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
-                <h4 class="fw-bold mb-1">Kho hàng điện gia dụng</h4>
-                <p class="text-muted small mb-0">Phân loại:
-                    <span class="badge bg-danger">Hết ({{ $countOutOfStock }})</span>
-                    <span class="badge bg-warning text-dark">Sắp hết ({{ $countLowStock }})</span>
-                    <span class="badge bg-success">Ổn định ({{ $countInStock }})</span>
-                </p>
+                <h4 class="fw-bold font-luxury text-primary">Kho hàng điện gia dụng</h4>
+                <div class="d-flex gap-2 mt-2">
+                    <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-3">Hết hàng: {{ $countOutOfStock }}</span>
+                    <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3">Sắp hết: {{ $countLowStock }}</span>
+                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3">Ổn định: {{ $countInStock }}</span>
+                </div>
             </div>
-            <a href="{{ route('admin.products') }}" class="btn btn-primary rounded-3">
+            <a href="{{ route('admin.products') }}" class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold">
                 <i class="fa-solid fa-plus me-2"></i>Thêm SP mới
             </a>
         </div>
 
         <!-- Tối ưu xem từng sản phẩm bằng Tabs -->
-        <div class="inventory-tabs mb-4 shadow-sm rounded-3">
-            <a href="#" class="tab-item active" data-filter="all">Tất cả</a>
-            @foreach ($categories as $category)
-                <a href="#" class="tab-item" data-filter="{{ $category->id }}">{{ $category->name }}</a>
-            @endforeach
+        <div class="card shadow-sm border-0 rounded-4 bg-white mb-4 overflow-hidden">
+            <div class="d-flex flex-wrap bg-light bg-opacity-50 p-2 overflow-auto" id="inventoryTabs">
+                <button class="nav-link-custom active" data-filter="all">Tất cả sản phẩm</button>
+                @foreach ($categories as $category)
+                    <button class="nav-link-custom" data-filter="{{ $category->id }}">{{ $category->name }}</button>
+                @endforeach
+            </div>
         </div>
 
         <!-- Inventory Table -->
-        <div class="inventory-card">
+        <div class="card shadow-sm border-0 rounded-4 bg-white overflow-hidden">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0" id="inventoryTable">
                     <thead class="table-light">
-                        <tr>
-                            <th class="ps-4">Sản phẩm</th>
+                        <tr class="small text-uppercase fw-bold text-muted">
+                            <th class="ps-4 py-3">Sản phẩm</th>
                             <th>Hãng / Model</th>
-                            <th>Tổng tồn</th>
-                            <th>Cảnh báo kho</th>
+                            <th>Số lượng tồn</th>
+                            <th>Trạng thái kho</th>
                             <th class="text-end pe-4">Thao tác</th>
                         </tr>
                     </thead>
@@ -51,65 +54,57 @@
                                 $stock = $product->stock ?? 0;
                                 $statusClass = 'success';
                                 $statusText = 'Còn hàng';
-                                $signalClass = 'signal-success';
 
                                 if ($stock <= 0) {
                                     $statusClass = 'danger';
                                     $statusText = 'Hết hàng';
-                                    $signalClass = 'signal-danger';
                                 } elseif ($stock <= 5) {
                                     $statusClass = 'warning';
                                     $statusText = 'Sắp hết hàng';
-                                    $signalClass = 'signal-warning';
                                 }
                             @endphp
                             <tr class="product-row" data-category="{{ $product->category_id }}">
                                 <td class="ps-4">
                                     <div class="d-flex align-items-center">
-                                        <div class="bg-light rounded-3 p-2 me-3"
-                                            style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">
-                                            @if ($product->image)
-                                                <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}"
-                                                    style="max-width: 100%; max-height: 100%; object-fit: cover;">
-                                            @else
-                                                <i class="fa-solid fa-box text-primary"></i>
-                                            @endif
+                                        <div class="bg-light rounded-3 d-flex align-items-center justify-content-center me-3"
+                                            style="width: 48px; height: 48px;">
+                                            <i class="fa-solid fa-box-open text-primary fs-4"></i>
                                         </div>
                                         <div>
                                             <div class="fw-bold text-dark">{{ $product->name }}</div>
-                                            <span class="text-muted small">Mã:
+                                            <span class="extra-small text-muted">Mã:
                                                 {{ $product->model ?? 'SP-' . str_pad($product->id, 5, '0', STR_PAD_LEFT) }}</span>
                                         </div>
                                     </div>
                                 </td>
-                                <td>{{ $product->brand ?? '—' }}</td>
-                                <td><span class="fs-5 fw-bold">{{ $stock }}</span> cái</td>
+                                <td><span class="small fw-medium text-secondary">{{ $product->brand ?? '—' }}</span></td>
+                                <td><span class="fs-5 fw-bold text-dark">{{ $stock }}</span> <small class="text-muted">cái</small></td>
                                 <td>
-                                    <ul class="stock-indicator-list">
-                                        <li>
-                                            <span class="status-signal {{ $signalClass }}"></span>
-                                            <span class="stock-label text-{{ $statusClass }}">{{ $statusText }}</span>
-                                        </li>
-                                    </ul>
+                                    @if($stock <= 0)
+                                        <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-3">Cần nhập kho</span>
+                                    @elseif($stock <= 5)
+                                        <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3">Cần nhập thêm</span>
+                                    @else
+                                        <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3">Kho ổn định</span>
+                                    @endif
                                 </td>
                                 <td class="text-end pe-4">
-                                    @if ($stock <= 0)
-                                        <a href="{{ route('admin.stock') }}" class="btn btn-sm btn-danger me-1">Nhập
-                                            hàng</a>
-                                    @elseif($stock <= 5)
-                                        <a href="{{ route('admin.stock') }}"
-                                            class="btn btn-sm btn-outline-warning text-dark border-warning me-1">Nhập
-                                            thêm</a>
-                                    @else
-                                        <button class="btn btn-sm btn-outline-primary me-1">Chi tiết</button>
-                                    @endif
-                                    <a href="{{ route('admin.products') }}?keyword={{ urlencode($product->name) }}"
-                                        class="btn btn-sm btn-light border"><i class="fa-solid fa-pen-to-square"></i></a>
+                                    <div class="btn-group shadow-sm rounded-pill overflow-hidden">
+                                        @if ($stock <= 5)
+                                            <a href="{{ route('admin.stock') }}" class="btn btn-white btn-sm px-3" title="Nhập hàng ngay">
+                                                <i class="fa-solid fa-truck-ramp-box text-danger"></i>
+                                            </a>
+                                        @endif
+                                        <a href="{{ route('admin.products') }}?keyword={{ urlencode($product->name) }}"
+                                            class="btn btn-white btn-sm px-3" title="Sửa thông tin">
+                                            <i class="fa-solid fa-pen-to-square text-primary"></i>
+                                        </a>
+                                    </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="text-center py-4 text-muted">Chưa có sản phẩm nào trong kho.</td>
+                                <td colspan="5" class="text-center py-5 text-muted">Chưa có sản phẩm nào trong kho.</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -121,14 +116,14 @@
     @push('scripts')
         <script>
             document.addEventListener('DOMContentLoaded', function () {
-                const tabs = document.querySelectorAll('.inventory-tabs .tab-item');
+                const tabs = document.querySelectorAll('#inventoryTabs .nav-link-custom');
                 const rows = document.querySelectorAll('.product-row');
 
                 tabs.forEach(tab => {
                     tab.addEventListener('click', function (e) {
                         e.preventDefault();
 
-                        // Remove active from all
+                        // Active state
                         tabs.forEach(t => t.classList.remove('active'));
                         this.classList.add('active');
 
@@ -151,3 +146,24 @@
         </script>
     @endpush
 @endsection
+
+<style>
+.nav-link-custom {
+    padding: 10px 20px;
+    border: none;
+    background: transparent;
+    color: #64748b;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: 50px;
+    margin-right: 5px;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+.nav-link-custom:hover { background: #f1f5f9; color: #0ea5e9; }
+.nav-link-custom.active { background: #0ea5e9; color: white; box-shadow: 0 4px 6px -1px rgba(14, 165, 233, 0.2); }
+.product-row { transition: all 0.2s; }
+.extra-small { font-size: 0.72rem; }
+.btn-white { background: white; border: 1px solid #f1f5f9; }
+.btn-white:hover { background: #f8fafc; }
+</style>

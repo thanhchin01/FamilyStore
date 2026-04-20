@@ -85,18 +85,27 @@
                 method: 'POST',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': document.querySelector('input[name=\"_token\"]').value
+                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
                 },
                 body: formData
             });
 
             const result = await response.json();
 
-            if (result.success) {
+            if (response.ok && result.success) {
                 showToast(result.message, 'success');
                 setTimeout(() => window.location.href = result.redirect, 1000);
             } else {
-                showToast(result.message, 'error');
+                // Xử lý lỗi từ Laravel (bao gồm cả lỗi validate 422)
+                let errorMessage = result.message || 'Đã có lỗi xảy ra. Vui lòng thử lại.';
+                
+                // Nếu có danh sách lỗi chi tiết (validate)
+                if (result.errors) {
+                    const firstErrorKey = Object.keys(result.errors)[0];
+                    errorMessage = result.errors[firstErrorKey][0];
+                }
+                
+                showToast(errorMessage, 'error');
             }
         } catch (error) {
             showToast('Có lỗi kết nối hệ thống. Vui lòng thử lại.', 'error');
