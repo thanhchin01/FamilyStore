@@ -34,9 +34,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // State (Trạng thái)
     let saleItems = [];
-    let currentCustomerDebt = 0;
+    window.currentCustomerDebt = 0;
 
     /* --------------------------------------------------------------------------
+
      * 1. HÀM TIỆN ÍCH (UTILITIES)
      * -------------------------------------------------------------------------- */
     function formatCurrency(value) {
@@ -74,7 +75,7 @@ document.addEventListener('DOMContentLoaded', function() {
         debtAmountInput.value = window.formatCurrency(debt);
 
         if (afterDebtAmount) {
-            afterDebtAmount.textContent = (currentCustomerDebt + debt).toLocaleString('vi-VN');
+            afterDebtAmount.textContent = (window.currentCustomerDebt + debt).toLocaleString('vi-VN');
         }
     }
 
@@ -193,21 +194,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     customerName.value = '';
                     customerAddress.value = '';
                     customerRelativeName.value = '';
-                    currentCustomerDebt = 0;
+                    window.currentCustomerDebt = 0;
                     currentDebtAlert.style.display = 'none';
                     alert('Không tìm thấy khách hàng nào với SĐT này. Vui lòng nhập thông tin mới.');
                     updateTotals();
                     return;
                 }
 
-                const c = data.customer;
                 customerName.value = c.name || '';
                 customerAddress.value = c.address || '';
                 customerRelativeName.value = c.relative_name || '';
                 
-                currentCustomerDebt = Number(data.total_debt) || 0;
-                if (currentCustomerDebt > 0) {
-                    currentDebtAmount.textContent = currentCustomerDebt.toLocaleString('vi-VN');
+                window.currentCustomerDebt = Number(data.total_debt) || 0;
+                if (window.currentCustomerDebt > 0) {
+                    currentDebtAmount.textContent = window.currentCustomerDebt.toLocaleString('vi-VN');
                     currentDebtAlert.style.display = 'block';
                 } else {
                     currentDebtAlert.style.display = 'none';

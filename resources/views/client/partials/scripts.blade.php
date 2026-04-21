@@ -119,4 +119,53 @@
     document.getElementById('ajaxLoginForm')?.addEventListener('submit', (e) => handleAuthSubmit(e, 'ajaxLoginForm'));
     document.getElementById('ajaxRegisterForm')?.addEventListener('submit', (e) => handleAuthSubmit(e,
         'ajaxRegisterForm'));
+
+    // --- GLOBAL ADD TO CART HANDLER ---
+    document.addEventListener('click', async function(e) {
+        if (e.target.closest('.add-to-cart-btn')) {
+            const btn = e.target.closest('.add-to-cart-btn');
+            const productId = btn.getAttribute('data-id');
+            const quantity = btn.getAttribute('data-qty') || 1;
+
+            const originalHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+
+            try {
+                const response = await fetch('{{ route('client.cart.add') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                        product_id: productId,
+                        quantity: quantity
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast(result.message, 'success');
+                    // Cập nhật số lượng giỏ hàng trên navbar
+                    const cartCounters = document.querySelectorAll('.cart-counter');
+                    cartCounters.forEach(counter => {
+                        counter.innerText = result.cart_count;
+                        counter.classList.add('animate__animated', 'animate__bounceIn');
+                        setTimeout(() => counter.classList.remove('animate__animated', 'animate__bounceIn'), 1000);
+                    });
+                } else {
+                    showToast(result.message || 'Không thể thêm sản phẩm.', 'error');
+                }
+            } catch (error) {
+                console.error('Cart Error:', error);
+                showToast('Có lỗi kết nối. Vui lòng thử lại.', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        }
+    });
 </script>

@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
-use App\Models\Sales;
+use App\Models\SaleInvoice;
 use App\Models\Products;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -19,8 +19,11 @@ class DashboardController extends Controller
     {
         $today = Carbon::today();
 
-        // 1. Doanh thu hôm nay (Từ Sales - Bán tại quầy)
-        $posRevenue = Sales::whereDate('sold_at', $today)->sum(DB::raw('price * quantity'));
+        // 1. Doanh thu hôm nay (Từ SaleInvoice - Bán tại quầy/POS)
+        $posRevenue = SaleInvoice::whereDate('sold_at', $today)
+            ->where('channel', 'pos')
+            ->sum('grand_total');
+
         
         // 2. Doanh thu hôm nay (Từ Order - Online)
         $onlineRevenue = Order::whereDate('placed_at', $today)

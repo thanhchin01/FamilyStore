@@ -47,6 +47,13 @@
                 </a>
             </li>
             <li class="sidebar-item">
+                <a href="{{ route('admin.users.index') }}"
+                    class="sidebar-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-user-gear"></i> Quản lý tài khoản
+                </a>
+            </li>
+
+            <li class="sidebar-item">
                 <a href="{{ route('admin.statistics') }}"
                     class="sidebar-link {{ request()->routeIs('admin.statistics') ? 'active' : '' }}">
                     <i class="fa-solid fa-chart-area"></i> Thống kê

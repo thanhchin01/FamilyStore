@@ -10,7 +10,8 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -37,7 +38,8 @@
     @include('client.partials.navbar')
 
     {{-- 2. Authentication Modal (Luôn nạp nếu chưa đăng nhập quyền Client) --}}
-    @if (!Auth::check() || Auth::user()->role !== 'client')
+    @if (!Auth::check())
+
         @include('client.partials.auth-modal')
     @endif
 
@@ -57,6 +59,9 @@
 
     {{-- 6. Essential Scripts --}}
     @include('client.partials.scripts')
+
+    {{-- 7. Global Confirmation Modal --}}
+    @include('client.partials.confirm-modal')
 
     @stack('scripts')
 

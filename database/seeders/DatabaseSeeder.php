@@ -15,8 +15,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Chạy AdminUserSeeder
-        $this->call(AdminUserSeeder::class);
+        // Chạy AdminSeeder
+        $this->call(AdminSeeder::class);
 
         // Tài khoản Khách hàng
         User::updateOrCreate(

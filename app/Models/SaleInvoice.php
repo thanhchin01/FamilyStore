@@ -49,4 +49,10 @@ class SaleInvoice extends Model
     {
         return $this->hasMany(DebtTransaction::class);
     }
+
+    public function debtBalance()
+    {
+        return $this->hasOne(CustomerDebtBalance::class, 'customer_id', 'customer_id');
+    }
 }
+

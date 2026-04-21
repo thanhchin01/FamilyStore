@@ -22,6 +22,7 @@ Route::prefix('client')->group(function () {
     
     // Công khai
     Route::post('/login', [ClientAuth::class, 'login']);
+    Route::post('/request-register-otp', [ClientAuth::class, 'requestRegisterOtp']);
     Route::post('/register', [ClientAuth::class, 'register']);
     Route::get('/products', [ClientProduct::class, 'index']);
     Route::get('/products/{id}', [ClientProduct::class, 'show']);

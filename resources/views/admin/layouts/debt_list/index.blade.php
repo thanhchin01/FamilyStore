@@ -49,8 +49,9 @@
                                         </div>
                                     </td>
                                     <td><span
-                                            class="fw-bold text-danger">{{ number_format($debtor->debt->total_debt ?? 0) }}đ</span>
+                                            class="fw-bold text-danger">{{ number_format($debtor->debtBalance->balance_amount ?? 0) }}đ</span>
                                     </td>
+
                                     <td class="text-end pe-4">
                                         <button class="btn btn-sm btn-white border rounded-circle shadow-sm">
                                             <i class="fa-solid fa-eye text-primary"></i>
@@ -83,9 +84,10 @@
                             <button class="btn btn-sm btn-success rounded-pill px-3 shadow-sm fw-bold" data-bs-toggle="modal"
                                 data-bs-target="#modalPayDebt" data-id="{{ $selectedCustomer->id }}"
                                 data-name="{{ $selectedCustomer->name }}"
-                                data-debt="{{ $selectedCustomer->debt->total_debt ?? 0 }}">
+                                data-debt="{{ $selectedCustomer->debtBalance->balance_amount ?? 0 }}">
                                 <i class="fas fa-money-bill-wave me-1"></i> Trả bớt nợ
                             </button>
+
                         </div>
 
                         <!-- Thông tin mở rộng -->
@@ -147,8 +149,9 @@
 
                         <div class="bg-light p-3 rounded-4 d-flex justify-content-between align-items-center mt-3 border border-dashed">
                             <span class="fw-bold small text-uppercase text-muted">Số dư nợ hiện tại:</span>
-                            <span class="fs-4 fw-bold text-danger">{{ number_format($selectedCustomer->debt->total_debt ?? 0) }}đ</span>
+                            <span class="fs-4 fw-bold text-danger">{{ number_format($selectedCustomer->debtBalance->balance_amount ?? 0) }}đ</span>
                         </div>
+
                     </div>
                 @else
                     <div class="debt-card p-5 text-center text-muted">

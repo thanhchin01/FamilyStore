@@ -8,7 +8,7 @@ use App\Http\Controllers\Admin\ImportController;
 
 Route::prefix('admin')
     ->name('admin.')
-    ->middleware(['auth', 'admin'])
+    ->middleware(['auth:admin'])
     ->group(function () {
         Route::get('/', [AdminController::class, 'index'])->name('dashboard');
         Route::get('/notifications/counts', [AdminController::class, 'getNotificationCounts'])->name('notifications.counts');
@@ -17,8 +17,8 @@ Route::prefix('admin')
         Route::get('/orders', [AdminController::class, 'orders'])->name('orders.index');
         Route::get('/sale', [AdminController::class, 'sale'])->name('sale');
         Route::post('/sale', [SaleController::class, 'store'])
-            ->name('sale.store')
-            ->middleware('auth');
+            ->name('sale.store');
+
         Route::get('/sales/history', [AdminController::class, 'saleHistory']);
         Route::get('/customers/find-by-phone', [AdminController::class, 'findCustomerByPhone']);
         Route::post('/debt/pay', [AdminController::class, 'payDebt'])->name('debt.pay');
@@ -35,7 +35,18 @@ Route::prefix('admin')
         Route::post('/products/{slug}/disable', [ProductController::class, 'disable'])->name('products.disable');
         Route::delete('/products/{slug}', [ProductController::class, 'destroy'])->name('products.destroy');
 
+        Route::post('/categories', [ProductController::class, 'storeCategory'])->name('categories.store');
+
+        // User Management
+        Route::get('/users', [\App\Http\Controllers\Admin\UserController::class, 'index'])->name('users.index');
+        Route::get('/users/{id}', [\App\Http\Controllers\Admin\UserController::class, 'show'])->name('users.show');
+        Route::post('/users/{id}/toggle', [\App\Http\Controllers\Admin\UserController::class, 'toggleStatus'])->name('users.toggle');
+        Route::delete('/users/{id}', [\App\Http\Controllers\Admin\UserController::class, 'destroy'])->name('users.destroy');
+
         Route::get('/statistics', [AdminController::class, 'statistics'])->name('statistics');
+
+
+
 
         // Chat Management
         Route::get('/chat', [\App\Http\Controllers\ChatController::class, 'adminIndex'])->name('chat.index');

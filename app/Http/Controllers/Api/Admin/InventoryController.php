@@ -53,8 +53,10 @@ class InventoryController extends Controller
             $product = $this->inventoryService->importProduct(
                 $request->product_id, 
                 $request->quantity, 
+                0,
                 $request->note ?? 'Nhập hàng nhanh từ Mobile App'
             );
+
 
             return response()->json([
                 'success' => true,

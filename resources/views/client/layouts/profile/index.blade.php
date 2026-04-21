@@ -10,9 +10,14 @@
             <div class="col-lg-4">
                 <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
                     <div class="card-header bg-primary-custom text-white text-center py-4 border-0">
-                        <div class="avatar-wrapper mb-3">
-                            <img src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=009688&color=fff&size=128" 
-                                 class="rounded-circle border border-4 border-white shadow-sm" alt="Avatar">
+                        <div class="avatar-wrapper mb-3 position-relative d-inline-block">
+                            @if(optional($user->customerProfile)->avatar)
+                                <img src="{{ asset('storage/' . $user->customerProfile->avatar) }}" 
+                                     class="rounded-circle border border-4 border-white shadow-sm" alt="Avatar">
+                            @else
+                                <img src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=009688&color=fff&size=128" 
+                                     class="rounded-circle border border-4 border-white shadow-sm" alt="Avatar">
+                            @endif
                         </div>
                         <h5 class="mb-1 fw-bold">{{ $user->name }}</h5>
                         <p class="mb-0 small opacity-75">Thành viên từ {{ $user->created_at->format('d/m/Y') }}</p>
@@ -43,10 +48,15 @@
                 <div id="info" class="card border-0 shadow-sm rounded-4 mb-4">
                     <div class="card-body p-4 p-md-5">
                         <h4 class="fw-bold mb-4">Thông tin cá nhân</h4>
-                        <form action="{{ route('client.profile.update') }}" method="POST">
+                        <form action="{{ route('client.profile.update') }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
                             <div class="row g-3">
+                                <div class="col-md-12">
+                                    <label class="form-label text-muted small fw-bold">ẢNH ĐẠI DIỆN</label>
+                                    <input type="file" name="avatar" class="form-control rounded-3 py-2" accept="image/*">
+                                    <div class="form-text small">Dung lượng tối đa 2MB (JPG, PNG, GIF)</div>
+                                </div>
                                 <div class="col-md-6">
                                     <label class="form-label text-muted small fw-bold">HỌ VÀ TÊN</label>
                                     <input type="text" name="name" class="form-control rounded-3 py-2" value="{{ $user->name }}" required>
@@ -59,11 +69,25 @@
                                     <label class="form-label text-muted small fw-bold">SỐ ĐIỆN THOẠI</label>
                                     <input type="text" name="phone" class="form-control rounded-3 py-2" value="{{ $user->phone }}" placeholder="Chưa cập nhật">
                                 </div>
+                                <div class="col-md-6">
+                                    <label class="form-label text-muted small fw-bold">GIỚI TÍNH</label>
+                                    <select name="gender" class="form-select rounded-3 py-2">
+                                        <option value="">Chọn giới tính</option>
+                                        <option value="male" {{ (optional($user->customerProfile)->gender == 'male') ? 'selected' : '' }}>Nam</option>
+                                        <option value="female" {{ (optional($user->customerProfile)->gender == 'female') ? 'selected' : '' }}>Nữ</option>
+                                        <option value="other" {{ (optional($user->customerProfile)->gender == 'other') ? 'selected' : '' }}>Khác</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label text-muted small fw-bold">NGÀY SINH</label>
+                                    <input type="date" name="birthday" class="form-control rounded-3 py-2" value="{{ optional($user->customerProfile)->birthday }}">
+                                </div>
                                 <div class="col-md-12">
                                     <label class="form-label text-muted small fw-bold">ĐỊA CHỈ THƯỜNG TRÚ</label>
                                     <textarea name="address" class="form-control rounded-3 py-2" rows="3" placeholder="Ví dụ: Thôn Khoa Quyên, Xã X... ">{{ $user->address }}</textarea>
                                 </div>
                             </div>
+
                             <div class="mt-4 pt-2 text-end">
                                 <button type="submit" class="btn btn-primary-custom px-5 py-2 fw-600 rounded-pill">Cập nhật thay đổi</button>
                             </div>

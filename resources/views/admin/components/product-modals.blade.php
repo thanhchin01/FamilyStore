@@ -1,4 +1,30 @@
+{{-- MODAL THÊM DANH MỤC --}}
+<div class="modal fade" id="createCategoryModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <form method="POST" action="{{ route('admin.categories.store') }}">
+                @csrf
+                <div class="modal-header bg-primary text-white py-3">
+                    <h5 class="modal-title fw-bold">Tạo danh mục sản phẩm</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Tên danh mục <span class="text-danger">*</span></label>
+                        <input type="text" name="name" class="form-control rounded-3" placeholder="Ví dụ: Đồ gia dụng, Điện tử..." required>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 p-4 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">Lưu danh mục</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 {{-- MODAL THÊM SẢN PHẨM --}}
+
 <div class="modal fade" id="createProductModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content border-0 shadow-lg rounded-4">

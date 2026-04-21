@@ -4,7 +4,8 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Customers;
-use App\Models\Debt_Transactions;
+use App\Models\DebtTransaction;
+use App\Models\CustomerDebtBalance;
 use App\Services\Admin\DebtService;
 use Illuminate\Http\Request;
 
@@ -22,14 +23,14 @@ class DebtManagerController extends Controller
      */
     public function index(Request $request)
     {
-        $customers = Customers::with('debt')
+        $customers = Customers::with('debtBalance')
             ->when($request->search, function($q) use ($request) {
                 $q->where('name', 'LIKE', '%' . $request->search . '%')
                   ->orWhere('phone', 'LIKE', '%' . $request->search . '%');
             })
             ->when($request->has_debt, function($q) {
-                $q->whereHas('debt', function($sq) {
-                    $sq->where('total_debt', '>', 0);
+                $q->whereHas('debtBalance', function($sq) {
+                    $sq->where('balance_amount', '>', 0);
                 });
             })
             ->paginate($request->get('per_page', 15));
@@ -45,8 +46,9 @@ class DebtManagerController extends Controller
      */
     public function history($customerId)
     {
-        $history = Debt_Transactions::where('customer_id', $customerId)
-            ->latest()
+        $history = DebtTransaction::where('customer_id', $customerId)
+            ->with(['saleInvoice'])
+            ->latest('occurred_at')
             ->paginate(20);
 
         return response()->json([
@@ -54,6 +56,7 @@ class DebtManagerController extends Controller
             'data'    => $history
         ]);
     }
+
 
     /**
      * Ghi nhận khách trả nợ nhanh

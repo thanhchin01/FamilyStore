@@ -7,8 +7,10 @@ use App\Http\Controllers\Controller;
 use App\Models\Categories;
 use App\Models\Customers;
 use App\Models\Products;
-use App\Models\Sales;
-use App\Models\Imports;
+use App\Models\SaleInvoice;
+use App\Models\ImportReceipt;
+use App\Models\CustomerDebtBalance;
+use App\Models\DebtTransaction;
 use App\Services\Admin\DebtService;
 use Illuminate\Http\Request;
 
@@ -17,22 +19,22 @@ class AdminController extends Controller
     public function index()
     {
         // 1. Tính toán các con số thống kê thực tế
-        $totalProducts = \App\Models\Products::count();
-        $totalSalesCount = \App\Models\Sales::count();
-        $totalRevenue = \App\Models\Sales::sum(\DB::raw('price * quantity'));
-        $totalCustomerDebt = \App\Models\Customer_Debts::sum('total_debt');
+        $totalProducts = Products::count();
+        $totalSalesCount = SaleInvoice::count();
+        $totalRevenue = SaleInvoice::sum('grand_total');
+        $totalCustomerDebt = CustomerDebtBalance::sum('balance_amount');
         
-        // 2. Lấy 5 đơn hàng mới nhất (Sales)
-        $recentSales = \App\Models\Sales::with(['product', 'customer'])
+        // 2. Lấy 5 đơn hàng mới nhất (SaleInvoice)
+        $recentSales = SaleInvoice::with(['customer'])
             ->latest()
             ->limit(5)
             ->get();
 
         // 3. Lấy 5 khách hàng nợ nhiều nhất
-        $topDebtors = \App\Models\Customers::join('customer__debts', 'customers.id', '=', 'customer__debts.customer_id')
-            ->where('customer__debts.total_debt', '>', 0)
-            ->orderByDesc('customer__debts.total_debt')
-            ->select('customers.*', 'customer__debts.total_debt')
+        $topDebtors = Customers::join('customer_debt_balances', 'customers.id', '=', 'customer_debt_balances.customer_id')
+            ->where('customer_debt_balances.balance_amount', '>', 0)
+            ->orderByDesc('customer_debt_balances.balance_amount')
+            ->select('customers.*', 'customer_debt_balances.balance_amount as total_debt')
             ->limit(5)
             ->get();
 
@@ -46,6 +48,7 @@ class AdminController extends Controller
         ));
     }
 
+
     public function inventory()
     {
         // Lấy tất cả sản phẩm kèm danh mục để hiển thị trong kho
@@ -57,25 +60,19 @@ class AdminController extends Controller
 
     public function sale()
     {
-        // $products = Products::all();
-        // $sales = Sales::latest()->limit(20)->get();
-        // return view('admin.layouts.sale.index', compact('products', 'sales'));
-        // ✅ Updated: sales history cần đọc thêm customer.debt cho modal & trạng thái nợ
-        
         // Trang Bán hàng (POS)
         return view('admin.layouts.sale.index', [
             'categories' => Categories::orderBy('name')->get(),
-            // Tối ưu: Chỉ lấy cột cần thiết để giảm tải, tránh lấy description dài
-            // Dữ liệu này sẽ được bắn sang JavaScript để xử lý chọn sản phẩm nhanh
             'products' => Products::select('id', 'name', 'price', 'stock', 'model', 'category_id')->get(),
-            // ✅ Updated: gom theo invoice_code sẽ xử lý ở view (groupBy)
-            // Lấy 100 đơn hàng gần nhất, kèm thông tin sản phẩm, khách hàng và nợ của khách đó
-            'sales' => Sales::with(['product', 'customer', 'customer.debt'])
+            // Lấy 100 đơn hàng gần nhất (POS)
+            'sales' => SaleInvoice::with(['items', 'customer.debtBalance'])
+                ->where('channel', 'pos')
                 ->orderByDesc('id')
                 ->limit(100)
                 ->get(),
         ]);
     }
+
 
     /**
      * Tìm khách theo SĐT (trả JSON cho AJAX).
@@ -85,21 +82,19 @@ class AdminController extends Controller
     {
         $phone = $request->get('phone');
         
-        // Nếu không có SĐT gửi lên -> trả về không tìm thấy
         if (empty($phone)) {
             return response()->json(['found' => false]);
         }
 
-        // Tìm khách trong DB, kèm thông tin nợ ('debt')
-        $customer = Customers::with('debt')->where('phone', $phone)->first();
+        // Tìm khách trong DB, kèm thông tin nợ ('debtBalance')
+        $customer = Customers::with('debtBalance')->where('phone', $phone)->first();
         if (!$customer) {
             return response()->json(['found' => false]);
         }
 
-        // Tính tổng nợ: nếu có bản ghi nợ thì lấy total_debt, ngược lại là 0
-        $totalDebt = $customer->debt ? (int) $customer->debt->total_debt : 0;
+        // Tính tổng nợ: nếu có bản ghi nợ thì lấy balance_amount, ngược lại là 0
+        $totalDebt = $customer->debtBalance ? (int) $customer->debtBalance->balance_amount : 0;
 
-        // Trả về JSON để JavaScript điền vào form bán hàng
         return response()->json([
             'found' => true,
             'customer' => [
@@ -113,59 +108,60 @@ class AdminController extends Controller
         ]);
     }
 
+
     /**
      * Ghi nhận khách trả nợ (từ modal xem chi tiết hoặc trang nợ).
      */
     public function payDebt(Request $request, DebtService $debtService)
     {
-        // Validate dữ liệu đầu vào: phải có ID khách và số tiền > 0
         $request->validate([
             'customer_id' => 'required|exists:customers,id',
             'amount' => 'required|integer|min:1',
         ]);
 
         $customer = Customers::findOrFail($request->customer_id);
-        $debt = $customer->debt;
+        $debt = $customer->debtBalance;
         
-        // Kiểm tra logic: Khách không nợ thì không thể trả
-        if (!$debt || $debt->total_debt <= 0) {
+        if (!$debt || $debt->balance_amount <= 0) {
             return redirect()->back()->with('error', 'Khách hàng không còn nợ.');
         }
 
-        // Đảm bảo số tiền trả không lớn hơn số tiền đang nợ
-        $amount = min((int) $request->amount, (int) $debt->total_debt);
+        $amount = min((int) $request->amount, (int) $debt->balance_amount);
         
-        // Gọi Service để xử lý trừ nợ và ghi log giao dịch
-        $debtService->payDebt($customer, $amount, $request->get('description'));
+        $debtService->payDebt(
+            $customer, 
+            $amount, 
+            $request->get('description'),
+            $request->get('sale_id')
+        );
 
         return redirect()->back()->with('success', 'Đã ghi nhận trả nợ ' . number_format($amount) . 'đ.');
     }
+
 
     public function history()
     {
         return view('admin.layouts.history.index', [
             'categories' => Categories::orderBy('name')->get(),
             'products' => Products::all(),
-            'sales' => Sales::with(['product', 'customer', 'customer.debt'])
+            'sales' => SaleInvoice::with(['customer.debtBalance'])
                 ->latest()
                 ->paginate(15),
         ]);
     }
 
+
     public function debt(Request $request)
     {
-        //  return view('admin.layouts.debt_list.index');
         // 1. Khởi tạo query từ model Customers
         $query = Customers::query();
 
-        // 2. Chỉ lấy khách đang có nợ (total_debt > 0)
-        // Sử dụng join để sắp xếp theo số tiền nợ giảm dần
-        $query->join('customer__debts', 'customers.id', '=', 'customer__debts.customer_id')
-            ->where('customer__debts.total_debt', '>', 0)
-            ->select('customers.*'); // Chỉ lấy các cột của bảng customer
+        // 2. Chỉ lấy khách đang có nợ (balance_amount > 0)
+        $query->join('customer_debt_balances', 'customers.id', '=', 'customer_debt_balances.customer_id')
+            ->where('customer_debt_balances.balance_amount', '>', 0)
+            ->select('customers.*');
 
         // 3. Xử lý tìm kiếm (nếu có từ khóa)
-        // Cho phép tìm theo tên hoặc số điện thoại khách hàng
         if ($request->filled('keyword')) {
             $keyword = $request->keyword;
             $query->where(function ($q) use ($keyword) {
@@ -174,9 +170,9 @@ class AdminController extends Controller
             });
         }
 
-        // 4. Eager load quan hệ 'debt'
-        $debtors = $query->with('debt')
-            ->orderByDesc('customer__debts.total_debt')
+        // 4. Eager load quan hệ 'debtBalance'
+        $debtors = $query->with('debtBalance')
+            ->orderByDesc('customer_debt_balances.balance_amount')
             ->paginate(15)
             ->appends($request->query());
 
@@ -187,50 +183,30 @@ class AdminController extends Controller
 
         if ($selectedId || $debtors->count() > 0) {
             $selectedCustomer = $selectedId 
-                ? Customers::with('debt')->find($selectedId) 
+                ? Customers::with('debtBalance')->find($selectedId) 
                 : $debtors->first();
 
             if ($selectedCustomer) {
-                // 1. Lấy các lần TRẢ NỢ (payment) và GHI NỢ LẺ (không qua hóa đơn - nếu có)
-                $transactions = \App\Models\Debt_Transactions::where('customer_id', $selectedCustomer->id)
-                    ->where(function($q) {
-                        $q->where('type', 'payment')
-                          ->orWhereNull('sale_id'); // Những lần ghi nợ bằng tay không qua bán hàng
-                    })
-                    ->orderByDesc('created_at')
+                // 1. Lấy lịch sử giao dịch công nợ
+                $transactions = DebtTransaction::where('customer_id', $selectedCustomer->id)
+                    ->orderByDesc('occurred_at')
                     ->get();
 
-                $transactionHistory = $transactions->map(function($t) {
+                $history = $transactions->map(function($t) {
                     return (object)[
-                        'type' => $t->type, 
+                        'type' => $t->type, // 'purchase', 'payment', 'adjustment'
                         'amount' => $t->amount,
                         'description' => $t->description,
-                        'occurred_at' => $t->created_at,
-                        'invoice_code' => null
+                        'occurred_at' => $t->occurred_at,
+                        'invoice_code' => $t->saleInvoice?->invoice_code
                     ];
                 });
-
-                // 2. Lấy các lần MUA HÀNG từ bảng sales
-                $salesHistory = \App\Models\Sales::with('product')
-                    ->where('customer_id', $selectedCustomer->id)
-                    ->orderByDesc('sold_at')
-                    ->get();
-
-                // Gộp chung và sắp xếp
-                $history = $transactionHistory->concat($salesHistory->map(function($sale) {
-                    return (object)[
-                        'type' => 'purchase',
-                        'amount' => $sale->price * $sale->quantity,
-                        'description' => $sale->product->name . ' (SL: ' . $sale->quantity . ')',
-                        'occurred_at' => $sale->sold_at,
-                        'invoice_code' => $sale->invoice_code
-                    ];
-                }))->sortByDesc('occurred_at');
             }
         }
 
         return view('admin.layouts.debt_list.index', compact('debtors', 'selectedCustomer', 'history'));
     }
+
 
     public function stock()
     {
@@ -238,11 +214,16 @@ class AdminController extends Controller
         return view('admin.layouts.stock_entry.index', [
             'categories' => Categories::orderBy('name')->get(),
             'products' => Products::with('category')->orderBy('name')->get(),
-            'imports' => Imports::with('product')
+            // Lấy các bản ghi biến động kho loại 'import' (nhập) để hiển thị lịch sử
+            'imports' => \App\Models\InventoryMovement::with('product')
+                ->where('movement_type', 'import')
                 ->latest()
                 ->paginate(15),
+
         ]);
+
     }
+
 
     public function products(Request $request)
     {
@@ -286,8 +267,8 @@ class AdminController extends Controller
         for ($i = 6; $i >= 0; $i--) {
             $date = now()->subDays($i);
             $labels[] = $date->format('d/m');
-            $dailySum = \App\Models\Sales::whereDate('created_at', $date->toDateString())
-                ->sum(\DB::raw('price * quantity'));
+            $dailySum = SaleInvoice::whereDate('sold_at', $date->toDateString())
+                ->sum('grand_total');
             $revenueData[] = $dailySum;
         }
 
@@ -299,14 +280,15 @@ class AdminController extends Controller
 
         // 3. Các chỉ số tổng hợp
         $stats = [
-            'today_revenue' => \App\Models\Sales::whereDate('created_at', now()->toDateString())->sum(\DB::raw('price * quantity')),
-            'new_orders_month' => \App\Models\Sales::whereMonth('created_at', now()->month)->count(),
-            'total_customers' => \App\Models\Customers::count(),
-            'new_debt_month' => \App\Models\Sales::whereMonth('created_at', now()->month)->sum(\DB::raw('price * quantity - IFNULL(paid_amount, 0)')),
+            'today_revenue' => SaleInvoice::whereDate('sold_at', now()->toDateString())->sum('grand_total'),
+            'new_orders_month' => SaleInvoice::whereMonth('sold_at', now()->month)->count(),
+            'total_customers' => Customers::count(),
+            'new_debt_month' => SaleInvoice::whereMonth('sold_at', now()->month)->sum('debt_amount'),
         ];
 
         return view('admin.layouts.statistics.index', compact('labels', 'revenueData', 'categoriesStats', 'stats'));
     }
+
 
     /**
      * Lấy số lượng thông báo mới (Đơn hàng & Tin nhắn)
@@ -315,10 +297,8 @@ class AdminController extends Controller
     {
         $orderCount = \App\Models\Order::where('status', 'pending')->count();
         
-        $messageCount = \App\Models\Message::where('is_read', false)
-            ->whereHas('sender', function($q) {
-                $q->where('role', '!=', 'admin');
-            })->count();
+        $messageCount = \App\Models\Message::where('is_read', false)->count();
+
 
         $data = [
             'success' => true,
@@ -328,11 +308,12 @@ class AdminController extends Controller
 
         // Nếu yêu cầu lấy danh sách khách nợ (Dùng cho trang POS)
         if ($request->get('type') === 'debtors') {
-            $data['debtors'] = Customers::join('customer__debts', 'customers.id', '=', 'customer__debts.customer_id')
-                ->where('customer__debts.total_debt', '>', 0)
-                ->select('customers.*', 'customer__debts.total_debt')
+            $data['debtors'] = Customers::join('customer_debt_balances', 'customers.id', '=', 'customer_debt_balances.customer_id')
+                ->where('customer_debt_balances.balance_amount', '>', 0)
+                ->select('customers.*', 'customer_debt_balances.balance_amount as total_debt')
                 ->get();
         }
+
 
         return response()->json($data);
     }

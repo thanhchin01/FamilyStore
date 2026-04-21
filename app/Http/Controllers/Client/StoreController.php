@@ -71,9 +71,55 @@ class StoreController extends Controller
         return redirect()->back()->with('success', 'Sản phẩm đã được thêm vào giỏ hàng!');
     }
 
+    public function updateCart(Request $request)
+    {
+        $productId = $request->input('product_id');
+        $quantity = $request->input('quantity');
+
+        $cart = $this->cartService->update($productId, $quantity);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Cập nhật số lượng thành công!',
+                'cart_count' => count($cart),
+                'subtotal' => number_format($this->cartService->subtotal()) . 'đ',
+                'item_total' => isset($cart[$productId]) ? number_format($cart[$productId]['price'] * $cart[$productId]['quantity']) . 'đ' : 0
+            ]);
+        }
+
+        return redirect()->back();
+    }
+
+    public function removeFromCart(Request $request)
+    {
+        $productId = $request->input('product_id');
+        $cart = $this->cartService->remove($productId);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Đã xóa sản phẩm khỏi giỏ hàng!',
+                'cart_count' => count($cart),
+                'subtotal' => number_format($this->cartService->subtotal()) . 'đ'
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Đã xóa sản phẩm khỏi giỏ hàng!');
+    }
+
     public function products(Request $request)
     {
         $query = Products::query()->where('is_active', true);
+
+        // Search by name
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'LIKE', "%{$search}%")
+                  ->orWhere('description', 'LIKE', "%{$search}%");
+            });
+        }
 
         // Filter by category
         if ($request->filled('category')) {

@@ -5,14 +5,14 @@
             <i class="fas fa-shopping-bag me-2"></i> K-Q <span>Store</span>
         </a>
         <div class="d-flex align-items-center order-lg-3 ms-auto">
-            <div class="search-box me-3 d-none d-xl-block">
+            <form action="{{ route('client.products.index') }}" method="GET" class="search-box me-3 d-none d-xl-block">
                 <div class="input-group input-group-sm">
                     <span class="input-group-text bg-transparent border-0"><i
                             class="fas fa-search text-muted"></i></span>
-                    <input type="text" class="form-control border-0 bg-transparent shadow-none"
-                        placeholder="Tìm tên hàng...">
+                    <input type="text" name="search" class="form-control border-0 bg-transparent shadow-none"
+                        placeholder="Tìm tên hàng..." value="{{ request('search') }}">
                 </div>
-            </div>
+            </form>
             <a href="{{ route('client.cart') }}" class="nav-link position-relative p-2 mx-1 mx-md-2">
                 <i class="fas fa-shopping-cart fa-lg text-primary-color"></i>
                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-counter"
@@ -20,7 +20,8 @@
                     {{ count(session()->get('cart', [])) }}
                 </span>
             </a>
-            @if (Auth::check() && Auth::user()->role === 'client')
+            @if (Auth::check())
+
                 <div class="dropdown ms-2 ms-md-3">
                     <button class="btn btn-primary-custom dropdown-toggle px-3 px-md-4 py-2" type="button"
                         id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">

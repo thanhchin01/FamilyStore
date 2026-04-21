@@ -10,10 +10,17 @@
                 <h4 class="fw-bold mb-1 font-luxury text-primary">Danh sách sản phẩm</h4>
                 <p class="text-muted small mb-0">Quản lý thông tin – giá bán – bảo hành</p>
             </div>
-            <button class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold" data-bs-toggle="modal"
-                data-bs-target="#createProductModal">
-                <i class="fa-solid fa-plus me-2"></i>Thêm sản phẩm mới
-            </button>
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-primary rounded-pill px-4 shadow-sm fw-bold" data-bs-toggle="modal"
+                    data-bs-target="#createCategoryModal">
+                    <i class="fa-solid fa-folder-plus me-2"></i>Thêm danh mục
+                </button>
+                <button class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold" data-bs-toggle="modal"
+                    data-bs-target="#createProductModal">
+                    <i class="fa-solid fa-plus me-2"></i>Thêm sản phẩm mới
+                </button>
+            </div>
+
         </div>
 
         <!-- Bộ lọc -->

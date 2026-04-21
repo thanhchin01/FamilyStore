@@ -33,23 +33,19 @@ class ImportController extends Controller
         $receiptCode = (string) Str::uuid(); 
         $note = $request->note;
 
-        // Sử dụng Transaction để đảm bảo toàn vẹn dữ liệu: 
-        // Hoặc là nhập thành công tất cả, hoặc nếu lỗi thì rollback không nhập dòng nào.
-        DB::transaction(function () use ($items, $inventoryService, $receiptCode, $note) {
+        // Sử dụng Transaction để đảm bảo toàn vẹn dữ liệu
+        DB::transaction(function () use ($items, $inventoryService, $note) {
             foreach ($items as $row) {
-                // InventoryService hiện tạo 1 dòng Imports + cộng tồn kho
-                // Hàm này sẽ tăng số lượng trong bảng products và tạo record trong bảng imports
-                $product = $inventoryService->importProduct((int) $row['product_id'], (int) $row['quantity'], $note);
-
-                // ✅ Updated: gắn receipt_code cho dòng import vừa tạo
-                // Logic ở đây là: Lấy danh sách imports của sản phẩm đó, sắp xếp mới nhất, lấy dòng đầu tiên
-                // Vì ta vừa gọi importProduct ở trên nên dòng mới nhất chính là dòng vừa tạo.
-                // Sau đó update cột receipt_code cho dòng đó.
-                $product->imports()->latest('id')->first()?->update([
-                    'receipt_code' => $receiptCode,
-                ]);
+                // InventoryService handles creating the receipt, item, movement, and updating stock
+                $inventoryService->importProduct(
+                    (int) $row['product_id'], 
+                    (int) $row['quantity'], 
+                    (int) ($row['unit_cost'] ?? 0), 
+                    $note
+                );
             }
         });
+
 
         return redirect()->back()->with('success', 'Nhập kho thành công');
     }

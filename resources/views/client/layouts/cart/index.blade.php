@@ -24,7 +24,7 @@
                             </thead>
                             <tbody>
                                 @forelse($cartItems as $item)
-                                <tr class="align-middle border-bottom border-light">
+                                <tr class="align-middle border-bottom border-light cart-row" data-id="{{ $item['id'] }}">
                                     <td class="py-4">
                                         <div class="d-flex align-items-center">
                                             <div class="p-2 border border-light-subtle rounded-3 me-3" style="width: 80px; height: 80px;">
@@ -44,19 +44,19 @@
                                     </td>
                                     <td class="py-4">
                                         <div class="d-flex align-items-center gap-2" style="max-width: 120px;">
-                                            <button class="btn btn-outline-secondary btn-sm rounded-circle px-2" style="width: 25px; height: 25px; padding: 0;"><i class="fas fa-minus small"></i></button>
-                                            <span class="fw-bold mx-2">{{ $item['quantity'] }}</span>
-                                            <button class="btn btn-outline-secondary btn-sm rounded-circle px-2" style="width: 25px; height: 25px; padding: 0;"><i class="fas fa-plus small"></i></button>
+                                            <button class="btn btn-outline-secondary btn-sm rounded-circle px-2 btn-update-qty" data-action="minus" style="width: 25px; height: 25px; padding: 0;"><i class="fas fa-minus small"></i></button>
+                                            <span class="fw-bold mx-2 item-quantity">{{ $item['quantity'] }}</span>
+                                            <button class="btn btn-outline-secondary btn-sm rounded-circle px-2 btn-update-qty" data-action="plus" style="width: 25px; height: 25px; padding: 0;"><i class="fas fa-plus small"></i></button>
                                         </div>
                                     </td>
                                     <td class="py-4">
                                         <span class="fw-medium">{{ number_format($item['price']) }}đ</span>
                                     </td>
                                     <td class="py-4">
-                                        <span class="fw-bold text-primary">{{ number_format($item['price'] * $item['quantity']) }}đ</span>
+                                        <span class="fw-bold text-primary item-total">{{ number_format($item['price'] * $item['quantity']) }}đ</span>
                                     </td>
                                     <td class="py-4 text-end">
-                                        <button class="btn btn-link text-danger text-decoration-none p-0">
+                                        <button class="btn btn-link text-danger text-decoration-none p-0 btn-remove-item">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
                                     </td>
@@ -81,7 +81,7 @@
                     <h5 class="fw-bold mb-4">Chi tiết đơn hàng</h5>
                     <div class="d-flex justify-content-between mb-3 text-secondary">
                         <span>Tạm tính:</span>
-                        <span>{{ number_format($total) }}đ</span>
+                        <span class="cart-subtotal">{{ number_format($total) }}đ</span>
                     </div>
                     <div class="d-flex justify-content-between mb-4 text-secondary">
                         <span>Phí vận chuyển:</span>
@@ -90,11 +90,11 @@
                     <hr class="mb-4">
                     <div class="d-flex justify-content-between mb-5">
                         <span class="fw-bold h5">Tổng cộng:</span>
-                        <span class="fw-bold h5 text-primary">{{ number_format($total) }}đ</span>
+                        <span class="fw-bold h5 text-primary cart-grand-total">{{ number_format($total) }}đ</span>
                     </div>
 
                     <div class="d-grid mb-3">
-                        <button class="btn btn-primary btn-lg rounded-3 fw-bold py-3 shadow-sm border-0 mb-3" style="background: linear-gradient(135deg, #5c62ec 0%, #4b52d1 100%);">TIẾN HÀNH THANH TOÁN</button>
+                        <a href="{{ route('client.checkout') }}" class="btn btn-primary btn-lg rounded-3 fw-bold py-3 shadow-sm border-0 mb-3 text-dark">TIẾN HÀNH THANH TOÁN</a>
                         <a href="{{ route('client.home') }}" class="btn btn-outline-secondary btn-lg rounded-3 fw-bold py-3">TIẾP TỤC MUA SẮM</a>
                     </div>
 
@@ -106,5 +106,133 @@
             </div>
         </div>
     </div>
+
+    @push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Update Quantity
+            document.querySelectorAll('.btn-update-qty').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const row = this.closest('.cart-row');
+                    const productId = row.getAttribute('data-id');
+                    const action = this.getAttribute('data-action');
+                    const qtyElement = row.querySelector('.item-quantity');
+                    let currentQty = parseInt(qtyElement.innerText);
+                    
+                    let newQty = action === 'plus' ? currentQty + 1 : currentQty - 1;
+                    if (newQty < 1) return; // Không cho giảm xuống dưới 1, dùng nút xóa để xóa
+
+                    updateCart(productId, newQty, row);
+                });
+            });
+
+            // Remove Item
+            document.querySelectorAll('.btn-remove-item').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const row = this.closest('.cart-row');
+                    const productId = row.getAttribute('data-id');
+                    const productName = row.querySelector('h6').innerText;
+
+                    // Setup Confirm Modal
+                    const modalEl = document.getElementById('confirmModal');
+                    const modal = new bootstrap.Modal(modalEl);
+                    const confirmBtn = document.getElementById('confirmModalActionBtn');
+                    
+                    document.getElementById('confirmModalTitle').innerText = 'Xóa sản phẩm';
+                    document.getElementById('confirmModalMessage').innerHTML = `Bạn có chắc chắn muốn xóa <b>${productName}</b> khỏi giỏ hàng?`;
+                    confirmBtn.className = 'btn btn-danger rounded-pill px-4 fw-600';
+                    confirmBtn.innerText = 'Xác nhận xóa';
+
+                    // Xử lý khi bấm nút xác nhận trong modal
+                    confirmBtn.onclick = async function() {
+                        modal.hide();
+                        await removeFromCart(productId, row);
+                    };
+
+                    modal.show();
+                });
+            });
+
+            async function updateCart(productId, quantity, row) {
+                try {
+                    const response = await fetch('{{ route('client.cart.update') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({ product_id: productId, quantity: quantity })
+                    });
+                    const result = await response.json();
+                    if (result.success) {
+                        row.querySelector('.item-quantity').innerText = quantity;
+                        row.querySelector('.item-total').innerText = result.item_total;
+                        updateCartTotals(result.subtotal, result.cart_count);
+                    }
+                } catch (error) {
+                    console.error('Update Error:', error);
+                    if (typeof showToast === 'function') {
+                        showToast('Không thể cập nhật số lượng.', 'error');
+                    }
+                }
+            }
+
+            async function removeFromCart(productId, row) {
+                try {
+                    const response = await fetch('{{ route('client.cart.remove') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({ product_id: productId })
+                    });
+                    const result = await response.json();
+                    if (result.success) {
+                        row.remove();
+                        updateCartTotals(result.subtotal, result.cart_count);
+                        
+                        if (typeof showToast === 'function') {
+                            showToast(result.message, 'success');
+                        }
+
+                        // Nếu giỏ hàng trống hoàn toàn, ẩn bảng và hiện thông báo trống mà không reload
+                        if (result.cart_count === 0) {
+                            const cartContainer = document.querySelector('.table-responsive').parentElement;
+                            cartContainer.innerHTML = `
+                                <div class="py-5 text-center text-secondary animate__animated animate__fadeIn">
+                                    <i class="fas fa-shopping-basket fa-3x mb-3 d-block opacity-25"></i>
+                                    <h4 class="fw-bold text-dark">Giỏ hàng của bạn đang trống!</h4>
+                                    <p class="mb-4">Hãy quay lại cửa hàng để chọn cho mình những sản phẩm ưng ý nhất.</p>
+                                    <a href="{{ route('client.products.index') }}" class="btn btn-primary-custom px-5 py-3 rounded-pill fw-bold shadow-sm">TIẾP TỤC MUA SẮM</a>
+                                </div>
+                            `;
+                            
+                            // Ẩn luôn phần chi tiết đơn hàng (Order Summary) bên phải nếu cần
+                            const summaryCol = document.querySelector('.col-lg-4');
+                            if (summaryCol) {
+                                summaryCol.style.opacity = '0.3';
+                                summaryCol.style.pointerEvents = 'none';
+                            }
+                        }
+                    }
+                } catch (error) {
+                    console.error('Remove Error:', error);
+                    if (typeof showToast === 'function') {
+                        showToast('Không thể xóa sản phẩm.', 'error');
+                    }
+                }
+            }
+
+            function updateCartTotals(subtotal, count) {
+                document.querySelectorAll('.cart-subtotal').forEach(el => el.innerText = subtotal);
+                document.querySelectorAll('.cart-grand-total').forEach(el => el.innerText = subtotal);
+                document.querySelectorAll('.cart-counter').forEach(el => el.innerText = count);
+            }
+        });
+    </script>
+    @endpush
 
 @endsection

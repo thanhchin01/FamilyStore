@@ -13,7 +13,9 @@
             <!-- Order Notification -->
             <a href="{{ route('admin.orders.index') }}" class="nav-link position-relative p-2" title="Đơn hàng mới">
                 <i class="fa-solid fa-cart-shopping fs-5"></i>
-                <span id="orderBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none" style="font-size: 0.6rem;">
+                <span id="orderBadge"
+                    class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none"
+                    style="font-size: 0.6rem;">
                     0
                 </span>
             </a>
@@ -21,7 +23,9 @@
             <!-- Message Notification -->
             <a href="{{ route('admin.chat.index') }}" class="nav-link position-relative p-2" title="Tin nhắn mới">
                 <i class="fa-solid fa-envelope fs-5"></i>
-                <span id="messageBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary-light d-none" style="font-size: 0.6rem; background-color: #009688 !important;">
+                <span id="messageBadge"
+                    class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary-light d-none"
+                    style="font-size: 0.6rem; background-color: #009688 !important;">
                     0
                 </span>
             </a>

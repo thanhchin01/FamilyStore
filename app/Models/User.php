@@ -19,20 +19,18 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'gender',
+        'birthday',
         'username',
         'email',
         'password',
-        'role',
         'phone',
         'address',
+        'avatar',
         'status',
         'last_login_at',
     ];
 
-    public function customerProfile()
-    {
-        return $this->hasOne(Customers::class, 'user_id');
-    }
 
     public function carts()
     {

@@ -9,6 +9,8 @@ Route::name('client.')->group(function () {
     Route::get('/products', [StoreController::class, 'products'])->name('products.index');
     Route::get('/cart', [StoreController::class, 'cart'])->name('cart');
     Route::post('/cart/add', [StoreController::class, 'addToCart'])->name('cart.add');
+    Route::post('/cart/update', [StoreController::class, 'updateCart'])->name('cart.update');
+    Route::post('/cart/remove', [StoreController::class, 'removeFromCart'])->name('cart.remove');
     Route::get('/checkout', [StoreController::class, 'checkout'])->name('checkout');
     Route::post('/checkout', [StoreController::class, 'placeOrder'])->name('checkout.place');
 

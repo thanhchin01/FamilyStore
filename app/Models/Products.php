@@ -38,20 +38,8 @@ class Products extends Model
         return $this->belongsTo(Categories::class, 'category_id');
     }
 
-    // Sản phẩm có nhiều lần nhập hàng
-    public function imports()
-    {
-        // ✅ Sửa foreign key: cột trong bảng imports là product_id (không phải products_id)
-        return $this->hasMany(Imports::class, 'product_id');
-    }
-
-    // Sản phẩm có nhiều lần bán
-    public function sales()
-    {
-        return $this->hasMany(Sales::class);
-    }
-
     public function cartItems()
+
     {
         return $this->hasMany(CartItem::class);
     }

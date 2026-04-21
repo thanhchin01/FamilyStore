@@ -159,10 +159,10 @@
                 if (e.target.classList.contains('money-input')) {
                     let cursorPosition = e.target.selectionStart;
                     let oldLength = e.target.value.length;
-                    
+
                     let formatted = formatCurrency(e.target.value);
                     e.target.value = formatted;
-                    
+
                     // Adjust cursor position
                     let newLength = e.target.value.length;
                     cursorPosition = cursorPosition + (newLength - oldLength);
@@ -178,7 +178,7 @@
                     hiddenInput.type = 'hidden';
                     hiddenInput.name = input.name;
                     hiddenInput.value = unformatCurrency(input.value);
-                    
+
                     // Disable the original input temporarily or remove its name to avoid double submission
                     input.dataset.originalName = input.name;
                     input.removeAttribute('name');

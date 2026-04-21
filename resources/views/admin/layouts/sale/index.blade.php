@@ -102,9 +102,13 @@
                                     <div class="input-group shadow-sm rounded-3">
                                         <span class="input-group-text bg-white border-end-0"><i class="fa-solid fa-search text-muted"></i></span>
                                         <input name="phone" id="customerPhone" type="text" class="form-control border-start-0 border-end-0 ps-0" placeholder="Số điện thoại...">
-                                        <button type="button" class="btn btn-primary px-3" data-bs-toggle="modal" data-bs-target="#modalSearchDebtor" title="Tìm theo Tên hoặc SĐT">
-                                            <i class="fa-solid fa-address-book"></i>
+                                        <button type="button" class="btn btn-primary px-3" id="btnFindCustomer" title="Tìm nhanh bằng SĐT">
+                                            Tìm
                                         </button>
+                                        <button type="button" class="btn btn-light border-start px-3" data-bs-toggle="modal" data-bs-target="#modalSearchDebtor" title="Mở danh sách khách nợ">
+                                            <i class="fa-solid fa-address-book text-primary"></i>
+                                        </button>
+
                                     </div>
                                     <div class="form-text extra-small text-primary fst-italic">Bấm nút danh bạ để tìm nhanh theo Tên hoặc SĐT.</div>
                                 </div>
@@ -151,7 +155,7 @@
 
                 <!-- Tóm tắt đơn hàng -->
                 <div class="col-lg-4">
-                    <div class="checkout-summary card p-4 shadow-lg border-0 rounded-4 bg-white sticky-top" style="top: 20px;">
+                    <div class="checkout-summary card p-4 shadow-lg border-0 rounded-4 bg-white sticky-top" style="top: 100px; z-index: 10;">
                         <h5 class="fw-bold mb-4 text-dark font-luxury">Hóa đơn bán hàng</h5>
 
                         <div class="d-flex justify-content-between mb-3">
@@ -177,8 +181,88 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Lịch sử giao dịch gần đây -->
+            <div class="row mt-5">
+                <div class="col-12">
+                    <div class="card shadow-sm border-0 rounded-4 bg-white overflow-hidden">
+                        <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                            <h6 class="fw-bold mb-0">Giao dịch vừa thực hiện</h6>
+                            <a href="{{ route('admin.history') }}" class="btn btn-sm btn-link text-decoration-none extra-small fw-bold">Xem tất cả lịch sử</a>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table align-middle table-hover mb-0">
+                                <thead class="bg-light">
+                                    <tr class="extra-small text-uppercase fw-bold text-muted">
+                                        <th class="ps-4 py-3">Mã đơn</th>
+                                        <th>Sản phẩm</th>
+                                        <th>Khách hàng</th>
+                                        <th>Tổng cộng</th>
+                                        <th>Trạng thái</th>
+                                        <th class="text-end pe-4">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($sales->take(10) as $sale)
+                                        @php 
+                                            // Chuẩn bị dữ liệu cho Modal (giống trang lịch sử)
+                                            $saleData = $sale->toArray();
+                                            $saleData['formatted_date'] = $sale->sold_at->format('d/m/Y H:i');
+                                            $saleData['items'] = $sale->items->load('product');
+                                            $saleData['customer'] = $sale->customer ? $sale->customer->load('debtBalance') : null;
+                                            $saleData['total'] = $sale->grand_total;
+                                            $saleData['debt'] = $sale->debt_amount;
+                                            // Load thêm lịch sử trả nợ cho hoá đơn này (qua relation đã định nghĩa ở model)
+                                            $saleData['transactions'] = $sale->debtTransactions()->latest()->get()->toArray();
+                                        @endphp
+                                        <tr>
+                                            <td class="ps-4 fw-bold text-primary">#{{ $sale->invoice_code }}</td>
+                                            <td>
+                                                @if($sale->items->count() === 1)
+                                                    <div class="fw-medium">{{ $sale->items->first()->product->name }}</div>
+                                                    <div class="extra-small text-muted">SL: {{ $sale->items->first()->quantity }}</div>
+                                                @else
+                                                    <div class="fw-medium">{{ $sale->items->count() }} mặt hàng</div>
+                                                    <div class="extra-small text-muted">
+                                                        {{ $sale->items->take(2)->map(function($i){ return $i->product->name; })->join(', ') }}...
+                                                    </div>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <div class="fw-bold small">{{ $sale->customer?->name ?? 'Khách lẻ' }}</div>
+                                                @if($sale->customer?->phone) <div class="extra-small text-muted">{{ $sale->customer->phone }}</div> @endif
+                                            </td>
+                                            <td class="fw-bold">{{ number_format($sale->grand_total) }}đ</td>
+                                            <td>
+                                                @if($sale->debt_amount > 0)
+                                                    <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-2">Nợ: {{ number_format($sale->debt_amount) }}đ</span>
+                                                @else
+                                                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-2">Đã trả đủ</span>
+                                                @endif
+                                            </td>
+                                            <td class="text-end pe-4">
+                                                <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3" 
+                                                    onclick="openSaleDetailModal({{ json_encode($saleData) }})">
+                                                    Chi tiết
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    @empty
+
+                                        <tr>
+                                            <td colspan="6" class="text-center py-4 text-muted small">Chưa có giao dịch nào.</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </form>
     </div>
+
+    @include('admin.components.sale-history-detail-modal')
 
     @push('scripts')
     <script>
@@ -192,6 +276,7 @@
 @endsection
 
 <style>
+.sales-container { padding-top: 60px; }
 .font-luxury { font-family: 'Playfair Display', serif; letter-spacing: 0.5px; }
 .extra-small { font-size: 0.7rem; }
 .form-label-custom { font-size: 0.75rem; color: #64748b; margin-bottom: 0.5rem; display: block; }

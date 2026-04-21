@@ -119,19 +119,20 @@
                                             <i class="fas fa-arrow-down fs-6"></i>
                                         </div>
                                         <div>
-                                            <div class="fw-bold small text-dark">{{ $imp->product?->name ?? '—' }}</div>
+                                            <div class="fw-bold small text-dark">{{ $imp->product?->name ?? 'Sản phẩm đã xóa' }}</div>
                                             <div class="extra-small text-muted">
                                                 {{ $imp->created_at->format('d/m/Y H:i') }}
                                             </div>
                                         </div>
                                     </div>
                                     <div class="text-end">
-                                        <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3">+{{ $imp->quantity }} cái</span>
+                                        <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3">+{{ $imp->quantity_delta }} cái</span>
                                         <div class="extra-small text-muted mt-1">Tồn k: {{ $imp->product?->stock ?? 0 }}</div>
                                     </div>
                                 </div>
                             </div>
                         @empty
+
                             <div class="p-5 text-center text-muted small">Chưa có lịch sử nhập kho.</div>
                         @endforelse
                     </div>

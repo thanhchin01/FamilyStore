@@ -92,9 +92,9 @@
 
                     <div class="d-grid gap-3 d-md-flex mb-4">
                         <button type="button" 
-                                id="btnAddToCartDetail"
+                                class="btn btn-primary-custom btn-lg rounded-pill flex-grow-1 fw-bold py-3 shadow-sm add-to-cart-btn"
                                 data-id="{{ $product->id }}"
-                                class="btn btn-primary-custom btn-lg rounded-pill flex-grow-1 fw-bold py-3 shadow-sm">
+                                onclick="this.setAttribute('data-qty', document.getElementById('productQty').value)">
                             <i class="fas fa-cart-plus me-2"></i> THÊM VÀO GIỎ HÀNG
                         </button>
                         <button class="btn btn-outline-danger btn-lg rounded-pill px-4 shadow-sm">
@@ -171,41 +171,6 @@
             thumb.classList.remove('opacity-50');
             thumb.classList.add('active-thumbnail');
         }
-
-        document.getElementById('btnAddToCartDetail')?.addEventListener('click', function() {
-            const productId = this.getAttribute('data-id');
-            const qty = document.getElementById('productQty').value;
-            
-            fetch('{{ route('client.cart.add') }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({
-                    product_id: productId,
-                    quantity: qty
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    if (typeof showToast === 'function') {
-                        showToast(data.message, 'success');
-                    } else {
-                        alert(data.message);
-                    }
-                    
-                    const cartCounter = document.querySelector('.cart-counter');
-                    if (cartCounter) {
-                        cartCounter.innerText = data.cart_count;
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-        });
     </script>
     @endpush
 

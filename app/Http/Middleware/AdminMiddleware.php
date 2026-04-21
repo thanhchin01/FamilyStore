@@ -14,11 +14,11 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check() && Auth::user()->role === 'admin') {
+        if (Auth::guard('admin')->check()) {
             return $next($request);
         }
 
-        Auth::logout();
-        return redirect()->route('admin.login')->with('error', 'Bạn không có quyền truy cập vào trang này.');
+        return redirect()->route('admin.login')->with('error', 'Vui lòng đăng nhập tài khoản quản trị.');
     }
+
 }

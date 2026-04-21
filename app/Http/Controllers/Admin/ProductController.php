@@ -9,9 +9,30 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\Admin\Product\StoreProductRequest;
 use App\Http\Requests\Admin\Product\UpdateProductRequest;
+use App\Models\Categories;
 
 class ProductController extends Controller
 {
+    /**
+     * Thêm danh mục mới
+     */
+    public function storeCategory(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255|unique:categories,name',
+        ]);
+
+        Categories::create([
+            'name' => $request->name,
+            'slug' => Str::slug($request->name),
+        ]);
+
+        return redirect()
+            ->back()
+            ->with('success', 'Thêm danh mục mới thành công');
+    }
+
+
     // Danh sách sản phẩm
     // public function index(Request $request)
     // {
@@ -66,7 +87,8 @@ class ProductController extends Controller
         // Nếu có số lượng tồn đầu kỳ > 0, ghi nhận vào kho
         if ($request->stock > 0) {
             $inventoryService = app(\App\Services\Admin\InventoryService::class);
-            $inventoryService->importProduct($product->id, (int) $request->stock, 'Khởi tạo tồn kho khi thêm sản phẩm');
+            $inventoryService->importProduct($product->id, (int) $request->stock, 0, 'Khởi tạo tồn kho khi thêm sản phẩm');
+
         }
 
         return redirect()
