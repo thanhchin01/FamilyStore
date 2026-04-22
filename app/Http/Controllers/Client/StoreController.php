@@ -24,13 +24,32 @@ class StoreController extends Controller
 
     public function home()
     {
-        $products = Products::where('is_active', true)
+        $featuredProducts = Products::with('category')
+            ->withAvg('reviews', 'rating')
+            ->withCount('reviews')
+            ->where('is_active', true)
             ->where('is_featured', true)
             ->latest()
             ->take(8)
             ->get();
 
-        return view('client.layouts.home.index', compact('products'));
+        $latestProducts = Products::with('category')
+            ->withAvg('reviews', 'rating')
+            ->withCount('reviews')
+            ->where('is_active', true)
+            ->latest()
+            ->take(4)
+            ->get();
+
+        $categories = Categories::where('is_active', true)
+            ->withCount([
+                'products' => fn ($query) => $query->where('is_active', true),
+            ])
+            ->orderBy('sort_order')
+            ->take(6)
+            ->get();
+
+        return view('client.layouts.home.index', compact('featuredProducts', 'latestProducts', 'categories'));
     }
 
     public function productDetail($slug)
@@ -110,7 +129,10 @@ class StoreController extends Controller
 
     public function products(Request $request)
     {
-        $query = Products::query()->where('is_active', true);
+        $query = Products::with('category')
+            ->withAvg('reviews', 'rating')
+            ->withCount('reviews')
+            ->where('is_active', true);
 
         // Search by name
         if ($request->filled('search')) {

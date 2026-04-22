@@ -1,17 +1,43 @@
-// resources/scss/_footer.scss
+.admin-footer {
+    padding: 0 2rem 2rem;
+}
 
-.custom-footer {
-    background-color: $footer-bg;
-    color: $text-light;
-    margin-top: auto;
-    // padding: 3rem 0 1.5rem;
+.admin-footer__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    color: $text-muted;
+    box-shadow: 0 18px 36px rgba(15, 23, 42, 0.05);
 
-    .footer-bottom {
-        border-top: 1px solid rgba(255, 255, 255, 0.05);
-        padding-top: 1.5rem;
-        text-align: center;
-        font-size: 0.9rem;
-        font-family: "Inter", sans-serif;
-        opacity: 0.7;
+    p,
+    span {
+        margin: 0;
+    }
+
+    p {
+        font-weight: 700;
+        color: $text-main;
+    }
+
+    span {
+        font-size: 0.92rem;
+    }
+}
+
+@media (max-width: 991.98px) {
+    .admin-footer {
+        padding: 0 1.25rem 1.25rem;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .admin-footer__inner {
+        flex-direction: column;
+        align-items: flex-start;
     }
 }

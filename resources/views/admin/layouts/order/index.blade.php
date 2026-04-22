@@ -50,25 +50,7 @@
                                 <div class="extra-small text-muted mt-1">{{ $order->payment_method }}</div>
                             </td>
                             <td>
-                                @php
-                                    $statusClasses = [
-                                        'pending' => 'bg-info-light text-info',
-                                        'processing' => 'bg-primary-light text-primary',
-                                        'shipping' => 'bg-warning-light text-warning',
-                                        'completed' => 'bg-success-light text-success',
-                                        'cancelled' => 'bg-danger-light text-danger',
-                                    ];
-                                    $statusLabels = [
-                                        'pending' => 'Chờ xử lý',
-                                        'processing' => 'Đang làm',
-                                        'shipping' => 'Đang giao',
-                                        'completed' => 'Hoàn tất',
-                                        'cancelled' => 'Đã hủy',
-                                    ];
-                                @endphp
-                                <span class="badge {{ $statusClasses[$order->status] ?? 'bg-secondary' }} rounded-pill px-3 py-2">
-                                    {{ $statusLabels[$order->status] ?? $order->status }}
-                                </span>
+                                <x-admin.status-badge :status="$order->status" />
                             </td>
                             <td class="px-4 text-end">
                                 <div class="btn-group shadow-sm rounded-pill overflow-hidden">
@@ -104,9 +86,6 @@
 .custom-table tbody tr:hover { transform: scale(1.005); background-color: #f8fafc; }
 .bg-success-light { background-color: #dcfce7; }
 .bg-warning-light { background-color: #fef9c3; }
-.bg-info-light { background-color: #e0f2fe; }
-.bg-primary-light { background-color: #ccfbf1; }
-.bg-danger-light { background-color: #fee2e2; }
 .btn-white { background: white; border: 1px solid #f1f5f9; }
 .btn-white:hover { background: #f8fafc; }
 .extra-small { font-size: 11px; }

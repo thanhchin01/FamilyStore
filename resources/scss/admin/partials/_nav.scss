@@ -1,89 +1,88 @@
-// resources/scss/_nav.scss
+.admin-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.25rem 2rem;
+    background: rgba(244, 247, 251, 0.88);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+}
 
-.custom-navbar {
-    z-index: 100; // Ensure it's above other elements
-    background: $glass-bg;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid $glass-border;
-    box-shadow: $box-shadow;
-    padding: 0.75rem 0;
-    transition: all $transition-speed ease;
+.admin-topbar__left,
+.admin-topbar__right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
 
-    .navbar-logo {
-        width: 60px;
-        filter: drop-shadow(0 0 5px rgba($primary-color, 0.2));
+.admin-topbar__toggle,
+.admin-topbar__icon {
+    width: 2.9rem;
+    height: 2.9rem;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 16px;
+    background: #fff;
+    color: $text-main;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-shadow: 0 10px 20px rgba(15, 23, 42, 0.04);
+}
+
+.admin-topbar__toggle {
+    border: 0;
+}
+
+.admin-topbar__eyebrow {
+    margin: 0 0 0.2rem;
+    color: $text-muted;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+}
+
+.admin-topbar__title {
+    margin: 0;
+    font-family: $font-heading;
+    font-size: 1.45rem;
+    font-weight: 700;
+}
+
+.admin-topbar__date {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1rem;
+    border-radius: 16px;
+    background: #fff;
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    color: $text-muted;
+    font-size: 0.92rem;
+}
+
+.admin-topbar__icon .badge {
+    position: absolute;
+    top: -0.25rem;
+    right: -0.15rem;
+}
+
+@media (max-width: 991.98px) {
+    .admin-topbar {
+        padding: 1rem 1.25rem;
     }
 
-    .navbar-brand {
-        font-family: "Outfit", sans-serif;
-        font-weight: 800;
-        font-size: 1.6rem;
-        color: $primary-color;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        letter-spacing: -0.5px;
-
-        i {
-            font-size: 2rem;
-            background: linear-gradient(135deg, $primary-color, $success-color);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+    .admin-topbar__date {
+        display: none;
     }
+}
 
-    .nav-link {
-        font-family: "Outfit", sans-serif;
-        font-weight: 600;
-        color: $text-main;
-        margin: 0 15px;
-        position: relative;
-        padding: 8px 0;
-        transition: color $transition-speed;
-
-        &:hover,
-        &.active {
-            color: $primary-hover;
-        }
-
-        &::after {
-            content: "";
-            position: absolute;
-            width: 0;
-            height: 3px;
-            bottom: 0;
-            left: 0;
-            background: linear-gradient(
-                to right,
-                $primary-color,
-                $success-color
-            );
-            border-radius: 5px;
-            transition: width $transition-speed
-                cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        &:hover::after,
-        &.active::after {
-            width: 100%;
-        }
-    }
-
-    .btn-sidebar-toggle {
-        border: none;
-        background: rgba($primary-color, 0.1);
-        border-radius: 10px;
-        font-size: 1.4rem;
-        color: $primary-color;
-        padding: 8px 12px;
-        cursor: pointer;
-        transition: all $transition-speed;
-
-        &:hover {
-            background: $primary-color;
-            color: #fff;
-            transform: scale(1.05);
-        }
+@media (max-width: 575.98px) {
+    .admin-topbar__title {
+        font-size: 1.15rem;
     }
 }

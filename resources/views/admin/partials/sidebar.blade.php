@@ -1,95 +1,69 @@
-<!-- resources/views/partials/sidebar.blade.php -->
-<div class="offcanvas offcanvas-end custom-sidebar" tabindex="-1" id="sidebarRight" aria-labelledby="sidebarRightLabel">
-    <div class="offcanvas-header">
-        <h5 class="offcanvas-title" id="sidebarRightLabel">
-            <i class="fa-solid fa-compass me-2"></i> Điều hướng
-        </h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+@php
+    $navItems = [
+        ['route' => 'admin.dashboard', 'active' => 'admin.dashboard', 'label' => 'Dashboard', 'icon' => 'fa-house'],
+        ['route' => 'admin.orders.index', 'active' => 'admin.orders.*', 'label' => 'Đơn hàng', 'icon' => 'fa-bag-shopping'],
+        ['route' => 'admin.sale', 'active' => 'admin.sale*', 'label' => 'Bán hàng', 'icon' => 'fa-cash-register'],
+        ['route' => 'admin.inventory', 'active' => 'admin.inventory*', 'label' => 'Kho hàng', 'icon' => 'fa-boxes-stacked'],
+        ['route' => 'admin.products', 'active' => 'admin.products*', 'label' => 'Sản phẩm', 'icon' => 'fa-box-open'],
+        ['route' => 'admin.debt', 'active' => 'admin.debt*', 'label' => 'Công nợ', 'icon' => 'fa-wallet'],
+        ['route' => 'admin.statistics', 'active' => 'admin.statistics*', 'label' => 'Thống kê', 'icon' => 'fa-chart-simple'],
+        ['route' => 'admin.chat.index', 'active' => 'admin.chat.*', 'label' => 'Tin nhắn', 'icon' => 'fa-comments'],
+        ['route' => 'admin.users.index', 'active' => 'admin.users.*', 'label' => 'Tài khoản', 'icon' => 'fa-users-gear'],
+    ];
+@endphp
+
+<div class="admin-sidebar-backdrop" data-sidebar-close></div>
+
+<aside class="admin-sidebar" id="adminSidebar">
+    <div class="admin-sidebar__header">
+        <a href="{{ route('admin.dashboard') }}" class="admin-brand">
+            <span class="admin-brand__mark">KQ</span>
+            <span class="admin-brand__text">
+                <strong>Khoa Quyen</strong>
+                <small>Admin Control</small>
+            </span>
+        </a>
+
+        <button type="button" class="admin-sidebar__close d-lg-none" data-sidebar-close aria-label="Đóng menu">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
     </div>
 
-    <div class="offcanvas-body p-0 d-flex flex-column">
-        <!-- Menu Links -->
-        <ul class="sidebar-menu flex-grow-1">
-            <li class="sidebar-item">
-                <a href="{{ route('admin.dashboard') }}"
-                    class="sidebar-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-                    <i class="fa-solid fa-house"></i> Dashboard
-                </a>
-            </li>
-            <li class="sidebar-item">
-                <a href="{{ route('admin.sale') }}"
-                    class="sidebar-link {{ request()->routeIs('admin.sale') ? 'active' : '' }}">
-                    <i class="fa-solid fa-chart-line"></i> Bán hàng
-                </a>
-            </li>
-            <li class="sidebar-item">
-                <a href="{{ route('admin.inventory') }}"
-                    class="sidebar-link {{ request()->routeIs('admin.inventory') ? 'active' : '' }}">
-                    <i class="fa-solid fa-box-open"></i> Quản lý kho hàng
-                </a>
-            </li>
-            <li class="sidebar-item">
-                <a href="{{ route('admin.debt') }}"
-                    class="sidebar-link {{ request()->routeIs('admin.debt') ? 'active' : '' }}">
-                    <i class="fa-solid fa-users"></i> DS khách hàng nợ
-                </a>
-            </li>
-            <li class="sidebar-item">
-                <a href="{{ route('admin.stock') }}"
-                    class="sidebar-link {{ request()->routeIs('admin.stock') ? 'active' : '' }}">
-                    <i class="fa-solid fa-gear"></i> Nhập kho
-                </a>
-            </li>
-            <li class="sidebar-item">
-                <a href="{{ route('admin.chat.index') }}"
-                    class="sidebar-link {{ request()->routeIs('admin.chat.*') ? 'active' : '' }}">
-                    <i class="fa-solid fa-comments"></i> Trung tâm tin nhắn
-                </a>
-            </li>
-            <li class="sidebar-item">
-                <a href="{{ route('admin.users.index') }}"
-                    class="sidebar-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
-                    <i class="fa-solid fa-user-gear"></i> Quản lý tài khoản
-                </a>
-            </li>
+    <div class="admin-sidebar__section">
+        <p class="admin-sidebar__label">Điều hướng</p>
 
-            <li class="sidebar-item">
-                <a href="{{ route('admin.statistics') }}"
-                    class="sidebar-link {{ request()->routeIs('admin.statistics') ? 'active' : '' }}">
-                    <i class="fa-solid fa-chart-area"></i> Thống kê
+        <nav class="admin-sidebar__nav">
+            @foreach ($navItems as $item)
+                <a href="{{ route($item['route']) }}"
+                    class="admin-sidebar__link {{ request()->routeIs($item['active']) ? 'is-active' : '' }}">
+                    <i class="fa-solid {{ $item['icon'] }}"></i>
+                    <span>{{ $item['label'] }}</span>
                 </a>
-            </li>
-        </ul>
+            @endforeach
+        </nav>
+    </div>
 
-        <!-- User Profile Section -->
-        {{-- <div class="sidebar-profile">
-            <img src="{{ asset('images/admin/avatar-1.jpg') }}" alt="User" class="profile-img">
-            <div class="profile-info">
-                <h6>Nguyễn Văn A</h6>
-                <span>Admin</span>
+    <div class="admin-sidebar__footer">
+        <div class="admin-user-card">
+            <div class="admin-user-card__avatar">
+                {{ strtoupper(mb_substr(auth('admin')->user()->name ?? 'A', 0, 1)) }}
             </div>
-            <a href="#" class="ms-auto text-light"><i class="fa-solid fa-right-from-bracket"></i></a>
-        </div> --}}
-        <div class="sidebar-profile">
-            <img src="{{ asset('images/admin/avatar-1.jpg') }}" alt="User" class="profile-img">
-
-            <div class="profile-info">
-                <h6>{{ auth()->user()->name ?? 'Admin' }}</h6>
-                <span>Admin</span>
+            <div class="admin-user-card__meta">
+                <strong>{{ auth('admin')->user()->name ?? 'Admin' }}</strong>
+                <span>Quản trị hệ thống</span>
             </div>
 
-            <!-- Logout -->
-            <a href="#" class="ms-auto text-light"
-                onclick="return confirm('Bạn có chắc muốn đăng xuất?') 
-    && (event.preventDefault(), document.getElementById('logout-form').submit());"
-                title="Đăng xuất">
+            <a href="#"
+                onclick="return confirm('Bạn có chắc muốn đăng xuất?') && (event.preventDefault(), document.getElementById('logout-form').submit());"
+                class="admin-user-card__logout"
+                aria-label="Đăng xuất">
                 <i class="fa-solid fa-right-from-bracket"></i>
             </a>
-
-            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                @csrf
-            </form>
         </div>
 
+        <form id="logout-form" action="{{ route('admin.logout') }}" method="POST" class="d-none">
+            @csrf
+        </form>
+
     </div>
-</div>
+</aside>

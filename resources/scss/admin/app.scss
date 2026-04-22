@@ -4,6 +4,7 @@
 @import 'shared/variables';
 @import '../../css/partials/toasts';
 @import 'shared/components';
+@import 'shared/layout';
 
 // 2. Bootstrap (Nếu cài qua npm)
 @import 'bootstrap/scss/bootstrap';
@@ -30,18 +31,6 @@ body {
     min-height: 100vh;
     overflow-x: hidden;
     scroll-behavior: smooth;
-}
-
-main {
-    flex: 1;
-    margin-top: 100px;
-    margin-bottom: 3rem;
-    animation: fadeIn 0.8s ease-out;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
 }
 
 a {

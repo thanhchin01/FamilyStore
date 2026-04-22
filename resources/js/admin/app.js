@@ -1,10 +1,57 @@
 import * as bootstrap from 'bootstrap';
 window.bootstrap = bootstrap;
-
-import { animate } from 'animejs';
 // import {
 //     runCounter
 // } from './anime';
+
+const body = document.body;
+const sidebarStateKey = 'admin-sidebar-collapsed';
+
+const applySidebarState = () => {
+    if (window.innerWidth <= 991) {
+        body.classList.remove('admin-sidebar-collapsed');
+        return;
+    }
+
+    if (localStorage.getItem(sidebarStateKey) === 'true') {
+        body.classList.add('admin-sidebar-collapsed');
+    } else {
+        body.classList.remove('admin-sidebar-collapsed');
+    }
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    const sidebarToggles = document.querySelectorAll('[data-sidebar-toggle]');
+    const sidebarClosers = document.querySelectorAll('[data-sidebar-close]');
+
+    applySidebarState();
+
+    sidebarToggles.forEach(button => {
+        button.addEventListener('click', () => {
+            if (window.innerWidth <= 991) {
+                body.classList.toggle('admin-sidebar-open');
+                return;
+            }
+
+            const collapsed = !body.classList.contains('admin-sidebar-collapsed');
+            body.classList.toggle('admin-sidebar-collapsed', collapsed);
+            localStorage.setItem(sidebarStateKey, collapsed ? 'true' : 'false');
+        });
+    });
+
+    sidebarClosers.forEach(button => {
+        button.addEventListener('click', () => {
+            body.classList.remove('admin-sidebar-open');
+        });
+    });
+
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 991) {
+            body.classList.remove('admin-sidebar-open');
+            applySidebarState();
+        }
+    });
+});
 
 // View bán hàng
 document.addEventListener('DOMContentLoaded', () => {
@@ -29,6 +76,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const oldCustomerSection = document.getElementById('oldCustomerSection');
 
     const form = document.querySelector('form');
+
+    if (!categorySelect || !productSelect || !priceInput || !quantityInput || !paidAmountInput || !debtAmountInput || !form) {
+        return;
+    }
 
     let unitPrice = 0;
     let total = 0;
@@ -95,12 +146,14 @@ document.addEventListener('DOMContentLoaded', () => {
     paidAmountInput.addEventListener('input', updateDebt);
 
     /* ===== KHÁCH QUEN / VÃNG LAI ===== */
-    customerRadios.forEach(radio => {
-        radio.addEventListener('change', () => {
-            oldCustomerSection.style.display =
-                radio.value === 'customer' ? 'block' : 'none';
+    if (oldCustomerSection && customerRadios.length) {
+        customerRadios.forEach(radio => {
+            radio.addEventListener('change', () => {
+                oldCustomerSection.style.display =
+                    radio.value === 'customer' ? 'block' : 'none';
+            });
         });
-    });
+    }
 
     /* ===== VALIDATE TRƯỚC KHI SUBMIT ===== */
     form.addEventListener('submit', e => {
@@ -134,6 +187,4 @@ window.confirmDelete = function(actionUrl, message = null) {
     
     modal.show();
 };
-
-
 

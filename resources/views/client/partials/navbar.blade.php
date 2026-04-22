@@ -1,73 +1,77 @@
-<!-- Premium Navbar -->
-<nav class="navbar navbar-expand-lg navbar-light navbar-custom sticky-top">
+<nav class="navbar navbar-expand-xl navbar-tech sticky-top">
     <div class="container">
-        <a class="navbar-brand" href="{{ route('client.home') }}">
-            <i class="fas fa-shopping-bag me-2"></i> K-Q <span>Store</span>
+        <a class="navbar-brand tech-brand" href="{{ route('client.home') }}">
+            <span class="tech-brand__mark">KQ</span>
+            <span class="tech-brand__text">
+                <strong>Khoa Quyen Store</strong>
+                <small>Home Tech Experience</small>
+            </span>
         </a>
-        <div class="d-flex align-items-center order-lg-3 ms-auto">
-            <form action="{{ route('client.products.index') }}" method="GET" class="search-box me-3 d-none d-xl-block">
-                <div class="input-group input-group-sm">
-                    <span class="input-group-text bg-transparent border-0"><i
-                            class="fas fa-search text-muted"></i></span>
-                    <input type="text" name="search" class="form-control border-0 bg-transparent shadow-none"
-                        placeholder="Tìm tên hàng..." value="{{ request('search') }}">
-                </div>
-            </form>
-            <a href="{{ route('client.cart') }}" class="nav-link position-relative p-2 mx-1 mx-md-2">
-                <i class="fas fa-shopping-cart fa-lg text-primary-color"></i>
-                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-counter"
-                    style="font-size: 0.6rem;">
-                    {{ count(session()->get('cart', [])) }}
-                </span>
-            </a>
-            @if (Auth::check())
 
-                <div class="dropdown ms-2 ms-md-3">
-                    <button class="btn btn-primary-custom dropdown-toggle px-3 px-md-4 py-2" type="button"
-                        id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-user-circle d-none d-sm-inline me-1"></i> <span class="d-none d-md-inline">{{ auth()->user()->name }}</span>
+        <div class="navbar-tech__actions order-xl-3 ms-auto">
+            <button type="button" class="navbar-tech__search-toggle d-xl-none" data-search-toggle aria-label="Mở tìm kiếm">
+                <i class="fas fa-search"></i>
+            </button>
+
+            <form action="{{ route('client.products.index') }}" method="GET" class="navbar-tech__search" data-search-panel>
+                <i class="fas fa-magnifying-glass"></i>
+                <input type="text" name="search" placeholder="Tìm sản phẩm, thương hiệu, model..."
+                    value="{{ request('search') }}">
+                <button type="submit">Tìm</button>
+            </form>
+
+            <a href="{{ route('client.cart') }}" class="navbar-tech__cart" aria-label="Giỏ hàng">
+                <i class="fas fa-bag-shopping"></i>
+                <span>{{ count(session()->get('cart', [])) }}</span>
+            </a>
+
+            @if (Auth::check())
+                <div class="dropdown">
+                    <button class="navbar-tech__account dropdown-toggle" type="button" id="profileDropdown"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-user-circle"></i>
+                        <span>{{ auth()->user()->name }}</span>
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg p-2 rounded-3"
+                    <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg p-2 rounded-4"
                         aria-labelledby="profileDropdown">
-                        <li><a class="dropdown-item py-2 px-3 rounded-2" href="{{ route('client.profile') }}"><i
-                                    class="fas fa-id-card me-2"></i> Hồ sơ</a></li>
+                        <li><a class="dropdown-item py-2 px-3 rounded-3" href="{{ route('client.profile') }}">Hồ sơ</a></li>
                         <li>
                             <form action="{{ route('logout') }}" method="POST">
                                 @csrf
-                                <button type="submit" class="dropdown-item py-2 px-3 rounded-2 text-danger"><i
-                                        class="fas fa-sign-out-alt me-2"></i> Thoát</button>
+                                <button type="submit" class="dropdown-item py-2 px-3 rounded-3 text-danger">Đăng xuất</button>
                             </form>
                         </li>
                     </ul>
                 </div>
             @else
-                <button type="button" class="btn btn-primary-custom ms-2 ms-md-3 px-3 px-md-4 py-2" data-bs-toggle="modal"
+                <button type="button" class="navbar-tech__account is-guest" data-bs-toggle="modal"
                     data-bs-target="#authModal">
-                    <i class="fas fa-user d-inline d-md-none"></i>
-                    <span class="d-none d-md-inline">ĐĂNG NHẬP</span>
+                    <i class="fas fa-user"></i>
+                    <span>Đăng nhập</span>
                 </button>
             @endif
-            
-            <button class="navbar-toggler border-0 ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon" style="width: 1.25em; height: 1.25em;"></span>
+
+            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Mở menu">
+                <span class="navbar-toggler-icon"></span>
             </button>
         </div>
 
-        <div class="collapse navbar-collapse order-lg-2" id="navbarNav">
-            <ul class="navbar-nav mx-auto mb-2 mb-lg-0 fw-600">
+        <div class="collapse navbar-collapse order-xl-2" id="navbarNav">
+            <ul class="navbar-nav mx-auto navbar-tech__menu">
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('client.home') ? 'active' : '' }}"
-                        href="{{ route('client.home') }}">TRANG CHỦ</a>
+                        href="{{ route('client.home') }}">Trang chủ</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('client.products.*') ? 'active' : '' }}"
-                        href="{{ route('client.products.index') }}">SẢN PHẨM</a>
+                        href="{{ route('client.products.index') }}">Sản phẩm</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">CHÍNH SÁCH</a>
+                    <a class="nav-link" href="{{ route('client.products.index', ['sort' => 'newest']) }}">Mới về</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">LIÊN HỆ</a>
+                    <a class="nav-link" href="{{ route('client.products.index', ['price_range' => '3']) }}">Cao cấp</a>
                 </li>
             </ul>
         </div>

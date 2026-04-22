@@ -11,6 +11,7 @@ use App\Models\SaleInvoice;
 use App\Models\ImportReceipt;
 use App\Models\CustomerDebtBalance;
 use App\Models\DebtTransaction;
+use App\Models\Order;
 use App\Services\Admin\DebtService;
 use Illuminate\Http\Request;
 
@@ -18,33 +19,24 @@ class AdminController extends Controller
 {
     public function index()
     {
-        // 1. Tính toán các con số thống kê thực tế
-        $totalProducts = Products::count();
-        $totalSalesCount = SaleInvoice::count();
         $totalRevenue = SaleInvoice::sum('grand_total');
-        $totalCustomerDebt = CustomerDebtBalance::sum('balance_amount');
-        
-        // 2. Lấy 5 đơn hàng mới nhất (SaleInvoice)
-        $recentSales = SaleInvoice::with(['customer'])
-            ->latest()
-            ->limit(5)
-            ->get();
+        $newOrdersCount = Order::whereDate('created_at', '>=', now()->subDays(7))->count();
+        $newCustomersCount = Customers::whereDate('created_at', '>=', now()->subDays(30))->count();
+        $lowStockProductsCount = Products::where('is_active', true)
+            ->where('stock', '<=', 5)
+            ->count();
 
-        // 3. Lấy 5 khách hàng nợ nhiều nhất
-        $topDebtors = Customers::join('customer_debt_balances', 'customers.id', '=', 'customer_debt_balances.customer_id')
-            ->where('customer_debt_balances.balance_amount', '>', 0)
-            ->orderByDesc('customer_debt_balances.balance_amount')
-            ->select('customers.*', 'customer_debt_balances.balance_amount as total_debt')
-            ->limit(5)
+        $latestOrders = Order::with(['customer', 'items.product'])
+            ->latest()
+            ->limit(8)
             ->get();
 
         return view('admin.layouts.dashboard.index', compact(
-            'totalProducts', 
-            'totalSalesCount', 
-            'totalRevenue', 
-            'totalCustomerDebt',
-            'recentSales',
-            'topDebtors'
+            'totalRevenue',
+            'newOrdersCount',
+            'newCustomersCount',
+            'lowStockProductsCount',
+            'latestOrders'
         ));
     }
 

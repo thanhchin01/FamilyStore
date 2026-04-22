@@ -1,6 +1,6 @@
-<!-- resources/views/partials/footer.blade.php -->
-<footer class="custom-footer">
-    <div class="footer-bottom">
-        <p>&copy; {{ date('Y') }} MyProject. All rights reserved.</p>
+<footer class="admin-footer">
+    <div class="admin-footer__inner">
+        <p>© {{ date('Y') }} Khoa Quyen Store Admin</p>
+        <span>Giao diện quản trị tối giản, tối ưu cho vận hành hằng ngày.</span>
     </div>
 </footer>

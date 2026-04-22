@@ -1,57 +1,64 @@
 @import 'variables';
 
-/* Navbar */
-.admin-navbar {
-  background: $bg;
-  padding: 0.5rem 1rem;
+body.admin-shell {
+    font-family: $font-main;
+    background: $light-bg;
+    color: $text-main;
+    min-height: 100vh;
 }
 
-.admin-navbar .brand-mark {
-  display: inline-flex;
-  width: 36px;
-  height: 36px;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  background: $brand-mark-bg;
-  color: $brand-mark-color;
-  font-weight: 700;
+.admin-app {
+    display: flex;
+    min-height: 100vh;
 }
 
-.admin-navbar .brand-text {
-  font-weight: 600;
-  color: darken($secondary, 10%);
+.admin-main {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 100vh;
+    margin-left: $sidebar-width;
+    transition: margin-left $transition-speed ease;
 }
 
-.avatar {
-  width: 34px;
-  height: 34px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
+.admin-page {
+    flex: 1;
+    padding: 2rem;
 }
 
-/* Sidebar / Offcanvas */
-.offcanvas-end {
-  background: $sidebar-bg;
-  border-left: 1px solid $sidebar-border;
+.admin-sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.36);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity $transition-speed ease, visibility $transition-speed ease;
+    z-index: 1010;
 }
 
-.offcanvas .list-group-item {
-  border: none;
-  padding: 0.9rem 1rem;
-  transition: background .12s ease, color .12s ease;
+body.admin-sidebar-open .admin-sidebar-backdrop {
+    opacity: 1;
+    visibility: visible;
 }
 
-.offcanvas .list-group-item:hover {
-  background: rgba($primary, 0.06);
-  color: $primary;
+body.admin-sidebar-collapsed .admin-main {
+    margin-left: $sidebar-collapsed-width;
 }
 
-.offcanvas .list-group-item span.me-2 { font-size: 1.05rem; }
+.admin-panel {
+    background: $white-bg;
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    border-radius: $border-radius;
+    box-shadow: $box-shadow;
+}
 
-// /* Footer */
-// .admin-footer {
-//   background: $bg;
-// }
+@media (max-width: 991.98px) {
+    .admin-main,
+    body.admin-sidebar-collapsed .admin-main {
+        margin-left: 0;
+    }
+
+    .admin-page {
+        padding: 1.25rem;
+    }
+}
