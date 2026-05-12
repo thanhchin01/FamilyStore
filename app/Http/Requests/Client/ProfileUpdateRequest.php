@@ -9,7 +9,7 @@ class ProfileUpdateRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return Auth::check() && Auth::user()->role === 'client';
+        return Auth::check();
     }
 
     public function rules(): array

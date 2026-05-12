@@ -121,6 +121,92 @@
         'ajaxRegisterForm'));
 
     // --- GLOBAL ADD TO CART HANDLER ---
+    async function addToCart(productId, quantity = 1) {
+        try {
+            const response = await fetch('{{ route('client.cart.add') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ product_id: productId, quantity: quantity })
+            });
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    showToast('Vui lòng đăng nhập để thực hiện hành động này.', 'error');
+                    const modalEl = document.getElementById('authModal');
+                    if (modalEl) {
+                        const authModal = new bootstrap.Modal(modalEl);
+                        authModal.show();
+                    }
+                    return;
+                }
+                throw new Error('Network response was not ok');
+            }
+
+            const result = await response.json();
+            if (result.success) {
+                showToast(result.message, 'success');
+                const cartCounters = document.querySelectorAll('.navbar-tech__cart span, .cart-counter');
+                cartCounters.forEach(counter => {
+                    counter.innerText = result.cart_count;
+                });
+            } else {
+                showToast(result.message || 'Không thể thêm sản phẩm.', 'error');
+            }
+        } catch (error) {
+            console.error('Cart Error:', error);
+            showToast('Có lỗi kết nối. Vui lòng thử lại.', 'error');
+        }
+    }
+
+    async function toggleWishlist(productId, btn) {
+        try {
+            const response = await fetch('{{ route('client.wishlist.toggle') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ product_id: productId })
+            });
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    showToast('Vui lòng đăng nhập để thực hiện hành động này.', 'error');
+                    const modalEl = document.getElementById('authModal');
+                    if (modalEl) {
+                        const authModal = new bootstrap.Modal(modalEl);
+                        authModal.show();
+                    }
+                    return;
+                }
+                throw new Error('Network response was not ok');
+            }
+
+            const data = await response.json();
+            if (data.success) {
+                btn.classList.toggle('active');
+                const icon = btn.querySelector('i');
+                if (data.action === 'added') {
+                    icon.classList.replace('far', 'fas');
+                    showToast(data.message, 'success');
+                } else {
+                    icon.classList.replace('fas', 'far');
+                    showToast(data.message, 'info');
+                }
+            } else {
+                showToast(data.message || 'Có lỗi xảy ra', 'error');
+            }
+        } catch (error) {
+            console.error('Wishlist Error:', error);
+            showToast('Không thể kết nối đến máy chủ', 'error');
+        }
+    }
+
     document.addEventListener('click', async function(e) {
         if (e.target.closest('.add-to-cart-btn')) {
             const btn = e.target.closest('.add-to-cart-btn');

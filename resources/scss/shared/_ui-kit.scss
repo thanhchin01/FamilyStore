@@ -1,0 +1,82 @@
+// resources/scss/shared/_ui-kit.scss
+
+// 1. Soft Badges
+$variants: (
+    "primary": #4f46e5,
+    "success": #10b981,
+    "danger": #ef4444,
+    "warning": #f59e0b,
+    "info": #3b82f6,
+    "secondary": #64748b,
+    "dark": #0f172a,
+    "slate": #475569
+);
+
+@each $name, $color in $variants {
+    .badge-soft-#{$name} {
+        background-color: rgba($color, 0.1);
+        color: $color;
+        border: 1px solid rgba($color, 0.15);
+        
+        &.badge-outline {
+            background-color: transparent;
+            border-color: rgba($color, 0.4);
+        }
+    }
+}
+
+// 2. Premium Cards
+.premium-card {
+    background: #ffffff;
+    border: 1px solid rgba(148, 163, 184, 0.1);
+    border-radius: 1.25rem;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    }
+    
+    .card-body {
+        padding: 1.5rem;
+    }
+}
+
+// 3. Senior Empty State
+.empty-state {
+    padding: 4rem 2rem;
+    text-align: center;
+    
+    &__icon {
+        width: 80px;
+        height: 80px;
+        background: rgba(148, 163, 184, 0.1);
+        color: #94a3b8;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    &__title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    &__text {
+        color: #64748b;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+}
+
+// 4. Utility: Glassmorphism
+.glass-panel {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}

@@ -6,18 +6,25 @@ use App\Http\Controllers\Client\StoreController;
 Route::name('client.')->group(function () {
     Route::get('/', [StoreController::class, 'home'])->name('home');
     Route::get('/product/{slug}', [StoreController::class, 'productDetail'])->name('products.show');
+    Route::get('/product-quick-view/{id}', [StoreController::class, 'quickView'])->name('products.quickView');
     Route::get('/products', [StoreController::class, 'products'])->name('products.index');
     Route::get('/cart', [StoreController::class, 'cart'])->name('cart');
     Route::post('/cart/add', [StoreController::class, 'addToCart'])->name('cart.add');
     Route::post('/cart/update', [StoreController::class, 'updateCart'])->name('cart.update');
     Route::post('/cart/remove', [StoreController::class, 'removeFromCart'])->name('cart.remove');
+    Route::post('/cart/clear', [StoreController::class, 'clearCart'])->name('cart.clear');
+
     Route::get('/checkout', [StoreController::class, 'checkout'])->name('checkout');
     Route::post('/checkout', [StoreController::class, 'placeOrder'])->name('checkout.place');
+
+    // Wishlist
+    Route::post('/wishlist/toggle', [\App\Http\Controllers\Client\WishlistController::class, 'toggle'])->name('wishlist.toggle');
 
     // Protected Client Routes
     Route::middleware(['auth', 'client'])->group(function () {
         Route::get('/profile', [\App\Http\Controllers\Client\ProfileController::class, 'index'])->name('profile');
         Route::put('/profile', [\App\Http\Controllers\Client\ProfileController::class, 'update'])->name('profile.update');
+        Route::get('/wishlist', [\App\Http\Controllers\Client\WishlistController::class, 'index'])->name('wishlist.index');
         
         // Chat Routes
         Route::get('/chat/messages', [\App\Http\Controllers\ChatController::class, 'getMessages'])->name('chat.messages');

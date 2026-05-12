@@ -73,4 +73,9 @@ class Products extends Model
     {
         return $this->hasMany(InventoryMovement::class, 'product_id');
     }
+
+    public function wishlists()
+    {
+        return $this->hasMany(Wishlist::class, 'product_id');
+    }
 }

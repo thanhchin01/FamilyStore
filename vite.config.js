@@ -9,11 +9,18 @@ export default defineConfig({
             input: [
                 'resources/scss/app.scss', 
                 'resources/css/client.scss', 
-                'resources/scss/admin/app.scss', 
                 'resources/js/app.js', 
-                'resources/js/sale.js',
                 'resources/js/client.js',
-                'resources/js/admin/app.js'
+                'resources/js/client/cart.js',
+                
+                // Page Specific Assets
+                'resources/scss/client/pages/product-detail.scss',
+                'resources/js/client/pages/product-detail.js',
+                'resources/scss/client/pages/profile.scss',
+                'resources/js/client/pages/profile.js',
+                'resources/scss/client/pages/wishlist.scss',
+                'resources/js/client/pages/wishlist.js'
+
             ],
             refresh: true,
         }),

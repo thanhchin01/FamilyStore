@@ -62,9 +62,9 @@ class ClientAuthController extends Controller
             'email'    => $request->email,
             'phone'    => $request->phone,
             'password' => Hash::make($request->password),
-            'role'     => 'client',
             'status'   => 'active',
         ]);
+
 
         Auth::guard('web')->login($user);
 

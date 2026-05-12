@@ -14,11 +14,14 @@ class ClientMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check() && Auth::user()->role === 'client') {
+        // Sử dụng guard 'web' cho khách hàng (Client)
+        if (Auth::guard('web')->check()) {
             return $next($request);
         }
 
-        Auth::logout();
+        // Nếu không phải khách hàng, xóa session và yêu cầu đăng nhập
+        Auth::guard('web')->logout();
         return redirect()->route('login')->with('error', 'Vui lòng đăng nhập tài khoản khách hàng.');
     }
+
 }

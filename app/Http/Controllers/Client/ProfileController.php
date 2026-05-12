@@ -37,28 +37,20 @@ class ProfileController extends Controller
         $user = Auth::user();
         
         // Cập nhật thông tin cơ bản
-        $user->update($request->only(['name', 'email', 'phone', 'address']));
-
-        // Xử lý thông tin Profile (Khách hàng)
-        $customerData = $request->only(['gender', 'birthday']);
+        $userData = $request->only(['name', 'email', 'phone', 'address', 'gender', 'birthday']);
 
         // Xử lý Upload Avatar
         if ($request->hasFile('avatar')) {
-            $customer = $user->customerProfile;
-            
             // Xóa ảnh cũ nếu có
-            if ($customer && $customer->avatar && \Illuminate\Support\Facades\Storage::disk('public')->exists($customer->avatar)) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($customer->avatar);
+            if ($user->avatar && \Illuminate\Support\Facades\Storage::disk('public')->exists($user->avatar)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($user->avatar);
             }
 
             $path = $request->file('avatar')->store('avatars', 'public');
-            $customerData['avatar'] = $path;
+            $userData['avatar'] = $path;
         }
 
-        $user->customerProfile()->updateOrCreate(
-            ['user_id' => $user->id],
-            $customerData
-        );
+        $user->update($userData);
 
         return redirect()->back()->with('success', 'Cập nhật thông tin cá nhân thành công.');
     }

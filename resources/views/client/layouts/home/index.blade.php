@@ -1,129 +1,145 @@
 @extends('client.layout')
 
-@section('title', 'K-Q Store - Công nghệ cho không gian sống hiện đại')
+@section('title', 'Luxe Appliance - The Pinnacle of Visual Precision')
 
 @section('content')
-    <section class="tech-hero">
-        <div class="container">
-            <div class="row align-items-center g-4">
-                <div class="col-lg-6">
-                    <div class="tech-hero__content">
-                        <span class="tech-badge">Không gian sống công nghệ</span>
-                        <h1>Thiết bị gia dụng hiện đại, giao diện mua sắm cao cấp và rõ ràng hơn.</h1>
-                        <p>
-                            Khoa Quyen Store chọn lọc những sản phẩm công nghệ gia dụng đáng tin cậy, dễ so sánh,
-                            dễ mua và phù hợp cho nhu cầu quản lý lẫn trải nghiệm khách hàng hiện đại.
-                        </p>
-
-                        <div class="tech-hero__actions">
-                            <a href="{{ route('client.products.index') }}" class="btn btn-tech-primary">Khám phá sản phẩm</a>
-                            <a href="#featured-products" class="btn btn-tech-secondary">Xem nổi bật</a>
-                        </div>
-
-                        <div class="tech-hero__metrics">
-                            <div>
-                                <strong>500+</strong>
-                                <span>Sản phẩm đang bán</span>
-                            </div>
-                            <div>
-                                <strong>24/7</strong>
-                                <span>Hỗ trợ nhanh</span>
-                            </div>
-                            <div>
-                                <strong>4.9/5</strong>
-                                <span>Mức hài lòng trung bình</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-6">
-                    <div class="tech-hero__visual">
-                        <div class="tech-hero__glow"></div>
-                        <img src="{{ asset('images/client/banner.png') }}" alt="Thiết bị nổi bật">
-
-                        <div class="tech-float-card">
-                            <span>Smart Search</span>
-                            <strong>Tìm đúng sản phẩm nhanh hơn</strong>
-                        </div>
-
-                        <div class="tech-float-card is-bottom">
-                            <span>Premium Selection</span>
-                            <strong>Danh mục rõ ràng, mua sắm trực quan</strong>
-                        </div>
-                    </div>
+<div class="luxe-home">
+    <!-- Hero Section -->
+    <section class="luxe-hero" style="position: relative; height: 85vh; min-height: 600px; display: flex; align-items: center; overflow: hidden; background-color: #000;">
+        <div class="luxe-hero__bg" style="position: absolute; inset: 0; z-index: 1;">
+            <img src="{{ asset('images/client/hero.png') }}" alt="Hero Banner" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.85;">
+            <div style="position: absolute; inset: 0; background: linear-gradient(90deg, rgba(0,0,0,0.4) 0%, transparent 60%);"></div>
+        </div>
+        
+        <div class="container" style="position: relative; z-index: 2;">
+            <div class="luxe-hero__content text-white" style="max-width: 600px;">
+                <span class="text-uppercase fw-bold mb-3 d-block" style="letter-spacing: 0.1em; font-size: 0.75rem; color: rgba(255,255,255,0.8);">New Arrival</span>
+                <h1 class="fw-800 display-3 mb-4">The Pinnacle of Visual Precision</h1>
+                <p class="fs-5 mb-5 text-white-50">
+                    Experience uncompromised clarity with the new Luxe Vision OLED Series. 
+                    Engineered for those who demand perfection in every pixel.
+                </p>
+                <div class="d-flex gap-3">
+                    <x-ui.button variant="secondary" size="lg" :href="route('client.products.index')">Shop Now</x-ui.button>
+                    <x-ui.button variant="outline" size="lg" class="text-white border-white" :href="route('client.products.index')">View Specifications</x-ui.button>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="tech-section">
+    <!-- Trust Bar -->
+    <div class="luxe-trust-bar py-4 bg-white border-bottom">
         <div class="container">
-            <x-ui.section-header
-                eyebrow="Danh mục nổi bật"
-                title="Đi thẳng vào nhóm sản phẩm bạn cần"
-                action-text="Xem toàn bộ danh mục"
+            <div class="row text-center">
+                <div class="col-md-4 border-end">
+                    <div class="d-flex align-items-center justify-content-center gap-3 fw-800 text-uppercase fs-7">
+                        <i class="fas fa-truck-fast fs-5"></i>
+                        <span>Fast, White-Glove Delivery</span>
+                    </div>
+                </div>
+                <div class="col-md-4 border-end">
+                    <div class="d-flex align-items-center justify-content-center gap-3 fw-800 text-uppercase fs-7">
+                        <i class="fas fa-shield-halved fs-5"></i>
+                        <span>Premium 2-Year Warranty</span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="d-flex align-items-center justify-content-center gap-3 fw-800 text-uppercase fs-7">
+                        <i class="fas fa-headset fs-5"></i>
+                        <span>24/7 Expert Support</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Curated Spaces (Categories) -->
+    <section class="luxe-section py-6 animate-fade-up">
+        <div class="container">
+            <x-ui.section-header 
+                title="Curated Spaces" 
+                action-text="Explore All Categories" 
                 :action-href="route('client.products.index')" />
 
-            <div class="tech-category-grid">
-                @foreach ($categories as $category)
-                    <a href="{{ route('client.products.index', ['category' => $category->slug]) }}" class="tech-category-card">
-                        <span class="tech-category-card__icon">
-                            <i class="fas fa-microchip"></i>
-                        </span>
-                        <strong>{{ $category->name }}</strong>
-                        <small>{{ $category->products_count }} sản phẩm</small>
-                    </a>
-                @endforeach
+            <div class="curated-grid">
+                <style>
+                    .curated-grid {
+                        display: grid;
+                        grid-template-columns: 2fr 1fr;
+                        grid-template-rows: repeat(2, 300px);
+                        gap: 1.5rem;
+                    }
+                    .grid-item {
+                        position: relative;
+                        border-radius: 12px;
+                        overflow: hidden;
+                        transition: all 0.3s ease;
+                    }
+                    .grid-item img {
+                        width: 100%; height: 100%; object-fit: cover;
+                        transition: transform 0.6s ease;
+                    }
+                    .grid-item:hover img { transform: scale(1.05); }
+                    .grid-item__content {
+                        position: absolute; bottom: 0; left: 0; width: 100%; padding: 2rem;
+                        background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+                        color: #fff;
+                    }
+                    .grid-item--large { grid-row: span 2; }
+                    @media (max-width: 991px) {
+                        .curated-grid { grid-template-columns: 1fr; grid-template-rows: auto; }
+                        .grid-item--large { grid-row: auto; height: 400px; }
+                        .grid-item { height: 300px; }
+                    }
+                </style>
+
+                <!-- Large Card (Kitchen) -->
+                <a href="{{ route('client.products.index', ['category' => 'kitchen']) }}" class="grid-item grid-item--large shadow-sm">
+                    <img src="{{ asset('images/client/kitchen.png') }}" alt="Kitchen">
+                    <div class="grid-item__content">
+                        <h3 class="fw-800 fs-2 mb-1">Kitchen</h3>
+                        <p class="mb-0 opacity-75">Culinary excellence redefined.</p>
+                    </div>
+                </a>
+
+                <!-- Small Card (Laundry) -->
+                <a href="{{ route('client.products.index', ['category' => 'laundry']) }}" class="grid-item shadow-sm">
+                    <img src="{{ asset('images/client/laundry.png') }}" alt="Laundry">
+                    <div class="grid-item__content">
+                        <h3 class="fw-800 fs-3 mb-0">Laundry</h3>
+                    </div>
+                </a>
+
+                <!-- Small Card (Living Room) -->
+                <a href="{{ route('client.products.index', ['category' => 'living-room']) }}" class="grid-item shadow-sm">
+                    <img src="{{ asset('images/client/living_room.png') }}" alt="Living Room">
+                    <div class="grid-item__content">
+                        <h3 class="fw-800 fs-3 mb-0">Living Room</h3>
+                    </div>
+                </a>
             </div>
         </div>
     </section>
 
-    <section class="tech-section tech-section--dense" id="featured-products">
+    <!-- Trending Innovations (Featured Products) -->
+    <section class="luxe-section py-6 bg-slate-50 animate-fade-up" style="background-color: #f8fafc; animation-delay: 0.2s;">
         <div class="container">
-            <x-ui.section-header
-                eyebrow="Sản phẩm nổi bật"
-                title="Lựa chọn công nghệ dành cho ngôi nhà hiện đại"
-                action-text="Mở toàn bộ catalog"
-                :action-href="route('client.products.index')" />
+            <x-ui.section-header title="Trending Innovations" />
 
             <div class="row g-4">
                 @foreach ($featuredProducts as $product)
-                    <div class="col-sm-6 col-xl-3">
-                        <x-ui.product-card :product="$product" cta-icon="fa-plus" />
+                    <div class="col-sm-6 col-lg-3">
+                        <x-ui.product-card :product="$product" />
                     </div>
                 @endforeach
             </div>
         </div>
     </section>
+</div>
 
-    <section class="tech-section">
-        <div class="container">
-            <x-ui.section-header
-                eyebrow="Mới cập nhật"
-                title="Sản phẩm mới lên kệ"
-                action-text="Xem hàng mới"
-                :action-href="route('client.products.index', ['sort' => 'newest'])" />
-
-            <div class="tech-mini-grid">
-                @foreach ($latestProducts as $product)
-                    <a href="{{ route('client.products.show', $product->slug) }}" class="tech-mini-card">
-                        <div class="tech-mini-card__thumb">
-                            @if ($product->image)
-                                <img src="{{ Str::startsWith($product->image, 'http') ? $product->image : asset('storage/' . $product->image) }}"
-                                    alt="{{ $product->name }}">
-                            @else
-                                <span><i class="fas fa-image"></i></span>
-                            @endif
-                        </div>
-                        <div class="tech-mini-card__body">
-                            <span>{{ $product->category->name ?? 'Thiết bị' }}</span>
-                            <strong>{{ $product->name }}</strong>
-                            <small>{{ number_format($product->price) }}đ</small>
-                        </div>
-                    </a>
-                @endforeach
-            </div>
-        </div>
-    </section>
+@push('scripts')
+<script>
+// Home page specific scripts if needed
+</script>
+@endpush
 @endsection

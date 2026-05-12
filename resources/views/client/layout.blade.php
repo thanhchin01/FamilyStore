@@ -20,7 +20,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <!-- Design System & Custom Style -->
+    <script>
+        window.isAuthenticated = @json(Auth::check());
+    </script>
     @vite(['resources/css/client.scss', 'resources/js/client.js'])
+
 
     @stack('styles')
 </head>
@@ -53,7 +57,8 @@
     @include('client.partials.footer')
 
     {{-- 5. System Notifications --}}
-    @include('client.partials.toasts')
+    <x-ui.toast-container />
+
 
     {{-- 6. Floating Contact Widgets --}}
     @include('client.partials.contact-widget')
@@ -63,6 +68,9 @@
 
     {{-- 7. Global Confirmation Modal --}}
     @include('client.partials.confirm-modal')
+
+    {{-- 8. Quick View Modal --}}
+    @include('client.partials.quick-view-modal')
 
     @stack('scripts')
 

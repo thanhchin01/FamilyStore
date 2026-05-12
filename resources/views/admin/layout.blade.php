@@ -13,7 +13,7 @@
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    @vite(['resources/scss/admin/app.scss', 'resources/js/admin/app.js'])
+    @vite(['resources/scss/admin/app.scss', 'resources/js/admin/app.js'], 'build-admin')
 </head>
 
 <body class="admin-shell">
@@ -31,8 +31,9 @@
         </div>
     </div>
 
-    @include('client.partials.toasts')
+    <x-ui.toast-container />
     @include('admin.components.confirm-delete-modal')
+
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {

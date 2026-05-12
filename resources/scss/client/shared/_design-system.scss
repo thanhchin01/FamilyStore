@@ -1,0 +1,58 @@
+// resources/scss/client/shared/_design-system.scss
+
+// 1. Color Palette
+$luxe-primary: #0f172a;    // Deep Navy
+$luxe-accent: #f8a145;     // Amber/Gold
+$luxe-success: #10b981;    // Emerald
+$luxe-error: #ef4444;      // Rose
+$luxe-warning: #f59e0b;    // Amber
+$luxe-info: #3b82f6;       // Blue
+
+$luxe-slate-50: #f8fafc;
+$luxe-slate-100: #f1f5f9;
+$luxe-slate-200: #e2e8f0;
+$luxe-slate-300: #cbd5e1;
+$luxe-slate-400: #94a3b8;
+$luxe-slate-500: #64748b;
+$luxe-slate-600: #475569;
+$luxe-slate-700: #334155;
+$luxe-slate-800: #1e293b;
+$luxe-slate-900: #0f172a;
+
+// 2. Typography
+$font-main: 'Inter', system-ui, -apple-system, sans-serif;
+$font-heading: 'Space Grotesk', 'Inter', sans-serif;
+
+// 3. Spacing & Border Radius
+$radius-sm: 4px;
+$radius-md: 8px;
+$radius-lg: 16px;
+$radius-full: 9999px;
+
+$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+$shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+// 4. Mixins for Maintainability
+@mixin flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@mixin transition-standard {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@mixin card-luxury {
+    background: #ffffff;
+    border: 1px solid $luxe-slate-200;
+    border-radius: $radius-lg;
+    box-shadow: $shadow-sm;
+    @include transition-standard;
+    &:hover {
+        box-shadow: $shadow-lg;
+        transform: translateY(-4px);
+    }
+}

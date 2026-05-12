@@ -1,0 +1,25 @@
+.fw-800 { font-weight: 800; }
+
+.empty-wishlist {
+    max-width: 500px;
+    margin: 100px auto;
+}
+
+.heart-pulse-container {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.wishlist-item-container {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    &.removing {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+}

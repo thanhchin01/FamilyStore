@@ -3,12 +3,12 @@
 ])
 
 @php
-    $classes = [
-        'pending' => 'status-pending',
-        'processing' => 'status-processing',
-        'shipping' => 'status-shipping',
-        'completed' => 'status-completed',
-        'cancelled' => 'status-cancelled',
+    $variants = [
+        'pending' => 'primary',
+        'processing' => 'info',
+        'shipping' => 'warning',
+        'completed' => 'success',
+        'cancelled' => 'danger',
     ];
 
     $labels = [
@@ -20,6 +20,7 @@
     ];
 @endphp
 
-<span {{ $attributes->merge(['class' => 'order-status ' . ($classes[$status] ?? 'status-pending')]) }}>
+<x-ui.badge :variant="$variants[$status] ?? 'secondary'" {{ $attributes }}>
     {{ $labels[$status] ?? ucfirst($status) }}
-</span>
+</x-ui.badge>
+

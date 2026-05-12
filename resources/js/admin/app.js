@@ -1,8 +1,11 @@
-import * as bootstrap from 'bootstrap';
-window.bootstrap = bootstrap;
-// import {
-//     runCounter
-// } from './anime';
+import { formatCurrency, formatDate, showToast, initConfirmModals } from '../helpers/ui-utils';
+
+window.formatCurrency = formatCurrency;
+window.formatDate = formatDate;
+window.showToast = showToast;
+
+initConfirmModals();
+
 
 const body = document.body;
 const sidebarStateKey = 'admin-sidebar-collapsed';

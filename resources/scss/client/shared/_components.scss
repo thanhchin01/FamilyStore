@@ -1,0 +1,229 @@
+@import "design-system";
+@import "animations";
+
+// 1. Button Component
+.btn-luxe {
+    border-radius: $radius-md;
+    @include transition-standard;
+    border: 1px solid transparent;
+    
+    &-primary {
+        background: $luxe-primary;
+        color: #fff;
+        &:hover {
+            background: lighten($luxe-primary, 5%);
+            transform: translateY(-2px);
+            box-shadow: $shadow-md;
+        }
+    }
+    
+    &-secondary {
+        background: $luxe-accent;
+        color: #fff;
+        &:hover {
+            filter: brightness(1.1);
+            transform: translateY(-2px);
+            box-shadow: $shadow-md;
+        }
+    }
+    
+    &-outline {
+        background: transparent;
+        border-color: $luxe-slate-300;
+        color: $luxe-primary;
+        &:hover {
+            border-color: $luxe-primary;
+            background: $luxe-slate-50;
+        }
+    }
+
+    &-ghost {
+        background: transparent;
+        color: $luxe-slate-600;
+        &:hover {
+            background: $luxe-slate-100;
+            color: $luxe-primary;
+        }
+    }
+}
+
+// 2. Product Card Component
+.luxe-product-card {
+    @include card-luxury;
+    padding: 1.25rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    &__image {
+        position: relative;
+        background: $luxe-slate-50;
+        border-radius: $radius-md;
+        aspect-ratio: 1/1;
+        overflow: hidden;
+        @include flex-center;
+        margin-bottom: 1.25rem;
+
+        img {
+            max-width: 85%;
+            max-height: 85%;
+            object-fit: contain;
+            @include transition-standard;
+        }
+    }
+
+    &:hover &__image img {
+        transform: scale(1.1);
+    }
+
+    &__badge {
+        position: absolute;
+        top: 0.75rem;
+        left: 0.75rem;
+        background: $luxe-primary;
+        color: #fff;
+        font-size: 0.65rem;
+        font-weight: 800;
+        padding: 0.25rem 0.6rem;
+        border-radius: $radius-sm;
+        text-transform: uppercase;
+    }
+
+    &__wishlist {
+        position: absolute;
+        top: 0.75rem;
+        right: 0.75rem;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #fff;
+        border: none;
+        @include flex-center;
+        box-shadow: $shadow-sm;
+        color: $luxe-slate-400;
+        @include transition-standard;
+        &:hover, &.active {
+            color: $luxe-error;
+            transform: scale(1.1);
+        }
+    }
+
+    &__quickview {
+        position: absolute;
+        bottom: 0.75rem;
+        left: 50%;
+        transform: translateX(-50%) translateY(10px);
+        width: 40px;
+        height: 40px;
+        border-radius: $radius-md;
+        background: #fff;
+        border: none;
+        @include flex-center;
+        box-shadow: $shadow-md;
+        color: $luxe-primary;
+        opacity: 0;
+        @include transition-standard;
+        &:hover {
+            background: $luxe-primary;
+            color: #fff;
+            transform: translateX(-50%) translateY(0) scale(1.1);
+        }
+    }
+
+    &:hover &__quickview {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+
+    &__content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    &__meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+    }
+
+    &__category {
+        font-size: 0.7rem;
+        font-weight: 800;
+        color: $luxe-slate-400;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    &__rating {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: $luxe-warning;
+    }
+
+    &__title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 1.25rem;
+        line-height: 1.4;
+        a {
+            color: $luxe-primary;
+            &:hover { color: $luxe-accent; }
+        }
+    }
+
+    &__footer {
+        margin-top: auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 1rem;
+        border-top: 1px solid $luxe-slate-100;
+    }
+
+    &__price {
+        display: flex;
+        flex-direction: column;
+    }
+
+    &__amount {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: $luxe-primary;
+    }
+
+    &__add-btn {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: $luxe-slate-100;
+        border: none;
+        color: $luxe-primary;
+        @include flex-center;
+        @include transition-standard;
+        &:hover {
+            background: $luxe-primary;
+            color: #fff;
+            transform: rotate(90deg);
+        }
+    }
+}
+
+// 3. Section Header Component
+.luxe-section-header {
+    &__eyebrow {
+        letter-spacing: 0.1em;
+        font-size: 0.75rem;
+    }
+    &__title {
+        color: $luxe-primary;
+        line-height: 1.1;
+    }
+    &__link:hover {
+        transform: translateX(5px);
+    }
+}

@@ -9,55 +9,105 @@
         </a>
 
         <div class="navbar-tech__actions order-xl-3 ms-auto">
-            <button type="button" class="navbar-tech__search-toggle d-xl-none" data-search-toggle aria-label="Mở tìm kiếm">
-                <i class="fas fa-search"></i>
-            </button>
-
-            <form action="{{ route('client.products.index') }}" method="GET" class="navbar-tech__search" data-search-panel>
-                <i class="fas fa-magnifying-glass"></i>
-                <input type="text" name="search" placeholder="Tìm sản phẩm, thương hiệu, model..."
-                    value="{{ request('search') }}">
-                <button type="submit">Tìm</button>
-            </form>
-
-            <a href="{{ route('client.cart') }}" class="navbar-tech__cart" aria-label="Giỏ hàng">
-                <i class="fas fa-bag-shopping"></i>
-                <span>{{ count(session()->get('cart', [])) }}</span>
-            </a>
-
-            @if (Auth::check())
-                <div class="dropdown">
-                    <button class="navbar-tech__account dropdown-toggle" type="button" id="profileDropdown"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-user-circle"></i>
-                        <span>{{ auth()->user()->name }}</span>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg p-2 rounded-4"
-                        aria-labelledby="profileDropdown">
-                        <li><a class="dropdown-item py-2 px-3 rounded-3" href="{{ route('client.profile') }}">Hồ sơ</a></li>
-                        <li>
-                            <form action="{{ route('logout') }}" method="POST">
-                                @csrf
-                                <button type="submit" class="dropdown-item py-2 px-3 rounded-3 text-danger">Đăng xuất</button>
-                            </form>
-                        </li>
-                    </ul>
-                </div>
-            @else
-                <button type="button" class="navbar-tech__account is-guest" data-bs-toggle="modal"
-                    data-bs-target="#authModal">
-                    <i class="fas fa-user"></i>
-                    <span>Đăng nhập</span>
+            <!-- Desktop Actions (Visible on XL+) -->
+            <div class="d-none d-xl-flex align-items-center gap-2">
+                <button type="button" class="navbar-tech__search-btn" data-bs-toggle="collapse"
+                    data-bs-target="#searchCollapse">
+                    <i class="fas fa-search"></i>
                 </button>
-            @endif
 
-            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse"
+                <a href="{{ Auth::check() ? route('client.wishlist.index') : 'javascript:void(0)' }}"
+                    class="navbar-tech__cart me-2" {{ !Auth::check() ? 'data-require-auth' : '' }}
+                    data-auth-msg="Vui lòng đăng nhập để xem danh sách yêu thích của bạn." title="Yêu thích">
+                    <i class="fas fa-heart text-danger"></i>
+                </a>
+
+                <a href="{{ Auth::check() ? route('client.cart') : 'javascript:void(0)' }}" class="navbar-tech__cart"
+                    {{ !Auth::check() ? 'data-require-auth' : '' }}
+                    data-auth-msg="Vui lòng đăng nhập để xem giỏ hàng và tiến hành mua sắm.">
+                    <i class="fas fa-bag-shopping"></i>
+                    <span>{{ count(session()->get('cart', [])) }}</span>
+                </a>
+
+                @if (Auth::check())
+                    <div class="dropdown">
+                        <button class="navbar-tech__account dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle"></i>
+                            <span>{{ auth()->user()->name }}</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg p-2 rounded-4">
+                            <li><a class="dropdown-item py-2 px-3 rounded-3" href="{{ route('client.profile') }}">Hồ
+                                    sơ</a></li>
+                            <li>
+                                <form action="{{ route('logout') }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item py-2 px-3 rounded-3 text-danger">Đăng
+                                        xuất</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                @else
+                    <button type="button" class="navbar-tech__account is-guest" data-bs-toggle="modal"
+                        data-bs-target="#authModal">
+                        <i class="fas fa-user"></i>
+                        <span>Đăng nhập</span>
+                    </button>
+                @endif
+            </div>
+
+            <!-- Mobile/Tablet Toggle -->
+            <button class="navbar-toggler border-0 shadow-none ms-2" type="button" data-bs-toggle="collapse"
                 data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Mở menu">
-                <span class="navbar-toggler-icon"></span>
+                <div class="toggler-icon">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
             </button>
         </div>
 
         <div class="collapse navbar-collapse order-xl-2" id="navbarNav">
+            <!-- Mobile Actions (Visible only on < XL) -->
+            <div class="d-xl-none py-3 border-bottom mb-3">
+                <div class="row g-2">
+                    <div class="col-4">
+                        <a href="{{ route('client.products.index') }}" class="mobile-action-card">
+                            <i class="fas fa-search"></i>
+                            <span>Tìm kiếm</span>
+                        </a>
+                    </div>
+                    <div class="col-4">
+                        <a href="{{ Auth::check() ? route('client.cart') : 'javascript:void(0)' }}"
+                            class="mobile-action-card position-relative"
+                            {{ !Auth::check() ? 'data-require-auth' : '' }}
+                            data-auth-msg="Vui lòng đăng nhập để xem giỏ hàng.">
+                            <i class="fas fa-bag-shopping"></i>
+                            <span
+                                class="badge rounded-pill bg-danger position-absolute top-0 start-100 translate-middle"
+                                style="font-size: 0.65rem;">
+                                {{ count(session()->get('cart', [])) }}
+                            </span>
+                            <span>Giỏ hàng</span>
+                        </a>
+                    </div>
+                    <div class="col-4">
+                        @if (Auth::check())
+                            <a href="{{ route('client.profile') }}" class="mobile-action-card">
+                                <i class="fas fa-user-circle"></i>
+                                <span>{{ explode(' ', auth()->user()->name)[0] }}</span>
+                            </a>
+                        @else
+                            <button type="button" class="mobile-action-card w-100 border-0 bg-transparent"
+                                data-bs-toggle="modal" data-bs-target="#authModal">
+                                <i class="fas fa-user"></i>
+                                <span>Đăng nhập</span>
+                            </button>
+                        @endif
+                    </div>
+                </div>
+            </div>
+
             <ul class="navbar-nav mx-auto navbar-tech__menu">
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('client.home') ? 'active' : '' }}"

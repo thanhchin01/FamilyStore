@@ -58,7 +58,30 @@ class StoreController extends Controller
             ->where('slug', $slug)
             ->firstOrFail();
 
-        return view('client.layouts.product.show', compact('product'));
+        $relatedProducts = Products::with('category')
+            ->where('category_id', $product->category_id)
+            ->where('id', '!=', $product->id)
+            ->where('is_active', true)
+            ->latest()
+            ->take(4)
+            ->get();
+
+        return view('client.layouts.product.show', compact('product', 'relatedProducts'));
+    }
+
+    public function quickView($id)
+    {
+        $product = Products::with(['category', 'productImages'])->findOrFail($id);
+        
+        return response()->json([
+            'id' => $product->id,
+            'name' => $product->name,
+            'price' => number_format($product->price) . 'đ',
+            'description' => Str::limit(strip_tags($product->description), 200),
+            'image' => Str::startsWith($product->image, 'http') ? $product->image : asset('storage/' . $product->image),
+            'category' => $product->category->name ?? 'Appliance',
+            'url' => route('client.products.show', $product->slug),
+        ]);
     }
 
     public function cart()
@@ -76,13 +99,18 @@ class StoreController extends Controller
     {
         $productId = $request->input('product_id');
         $quantity = $request->input('quantity', 1);
+        $isBuyNow = $request->input('buy_now', false);
+
+        if ($isBuyNow) {
+            $this->cartService->clear();
+        }
 
         $cart = $this->cartService->add($productId, $quantity);
 
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
-                'message' => 'Sản phẩm đã được thêm vào giỏ hàng!',
+                'message' => $isBuyNow ? 'Đang chuyển hướng đến thanh toán...' : 'Sản phẩm đã được thêm vào giỏ hàng!',
                 'cart_count' => count($cart)
             ]);
         }
@@ -126,6 +154,23 @@ class StoreController extends Controller
 
         return redirect()->back()->with('success', 'Đã xóa sản phẩm khỏi giỏ hàng!');
     }
+
+    public function clearCart(Request $request)
+    {
+        $this->cartService->clear();
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Đã làm trống giỏ hàng!',
+                'cart_count' => 0,
+                'subtotal' => '0đ'
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Đã làm trống giỏ hàng!');
+    }
+
 
     public function products(Request $request)
     {
